@@ -30,7 +30,7 @@ tokens = (
     'NEWLINE',
     'DEC',
     'HEX',
-    'COMMA',
+    'LABEL'
 )
 
 reserved = {
@@ -85,9 +85,13 @@ t_STOREY = r'StoreY'
 t_DEC = r'DEC'
 t_HEX = r'HEX'
 t_NUM = r'[0-9]+'
-t_COMMA = r','
 t_NEWLINE = r'\n'
 t_ignore = ' \t'
+
+
+def t_LABEL(t):
+    r'[A-Za-z_]+,'
+    return t
 
 
 def t_ID(t):
