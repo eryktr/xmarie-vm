@@ -7,19 +7,17 @@ class NumberDefinition:
     val: Any
 
     def eval(self):
-        pass
+        return int(self.val)
 
 
 @dataclass(frozen=True)
 class HEX(NumberDefinition):
-    def eval(self):
-        return int(self.val, 16)
+    pass
 
 
 @dataclass(frozen=True)
 class DEC(NumberDefinition):
-    def eval(self):
-        return int(self.val)
+    pass
 
 
 @dataclass(frozen=True)

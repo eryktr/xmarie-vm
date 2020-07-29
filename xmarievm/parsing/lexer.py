@@ -85,8 +85,6 @@ t_STOREX = r'StoreX'
 t_STOREY = r'StoreY'
 t_DEC = r'DEC'
 t_HEX = r'HEX'
-t_NUM = r'[0-9]+'
-t_HEXNUM = r'0x[0-9A-F]+'
 t_NEWLINE = r'\n+'
 t_ignore = ' \t'
 
@@ -100,6 +98,18 @@ def t_ID(t):
     r'[A-Za-z_]+'
     if t.value in reserved:
         t.type = reserved[t.value]
+    return t
+
+
+def t_HEXNUM(t):
+    r'0x[0-9A-F]+'
+    t.value = int(t.value, 16)
+    return t
+
+
+def t_NUM(t):
+    r'[0-9]+'
+    t.value = int(t.value)
     return t
 
 
