@@ -14,7 +14,16 @@ def p_program(p):
     '''
     program : instructions
     '''
-    p[0] = p[1]
+    instructions = []
+    labels = {}
+    for ast_obj in p[1]:
+        if isinstance(ast_obj, ast_types.Label):
+            if ast_obj.name in labels:
+                raise NameError(f'Redefined label: {ast_obj.name}')
+            labels[ast_obj.name] = ast_obj.target.eval()
+        else:
+            instructions.append(ast_obj)
+    p[0] = ast_types.Program(instructions=instructions, labels=labels)
 
 
 def p_instructions_instruction(p):
@@ -57,7 +66,7 @@ def p_label_definition(p):
 
 def p_number_definition(p):
     '''
-    number_definition : HEX NUM NEWLINE
+    number_definition : HEX HEXNUM NEWLINE
                       | DEC NUM NEWLINE
     '''
     p[0] = _get_ast_obj(p[1])(p[2])
@@ -92,7 +101,10 @@ parser = yacc.yacc(write_tables=False, debug=False)
 code = '''\
 Load X
 Store Y
-MyLabel, HEX 20
+
+MyLabel, HEX 0x20
+MyAnotherLabel, DEC 20
+TurboHex, HEX 0xAA
 Load Z
 Store THERE
 Load 10

@@ -3,6 +3,7 @@ import ply.lex as lex
 tokens = (
     'ID',
     'NUM',
+    'HEXNUM',
     'JNS',
     'LOAD',
     'STORE',
@@ -30,7 +31,7 @@ tokens = (
     'NEWLINE',
     'DEC',
     'HEX',
-    'LABEL'
+    'LABEL',
 )
 
 reserved = {
@@ -85,7 +86,8 @@ t_STOREY = r'StoreY'
 t_DEC = r'DEC'
 t_HEX = r'HEX'
 t_NUM = r'[0-9]+'
-t_NEWLINE = r'\n'
+t_HEXNUM = r'0x[0-9A-F]+'
+t_NEWLINE = r'\n+'
 t_ignore = ' \t'
 
 

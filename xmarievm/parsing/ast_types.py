@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, List, Dict
 
 
 @dataclass(frozen=True)
@@ -29,12 +29,17 @@ class Label:
 
 
 @dataclass(frozen=True)
-class Action:
+class Instruction:
     pass
 
 
 @dataclass(frozen=True)
-class Command:
+class Action(Instruction):
+    pass
+
+
+@dataclass(frozen=True)
+class Command(Instruction):
     arg: Any
 
 
@@ -122,3 +127,9 @@ class ShiftR(Command):
 
 
 Halt = _Halt()
+
+
+@dataclass(frozen=True)
+class Program:
+    instructions: List[Instruction]
+    labels: Dict[str, int]
