@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, List, Dict
 
 
@@ -23,55 +23,100 @@ class DEC(NumberDefinition):
 @dataclass(frozen=True)
 class Label:
     name: str
-    target: Any
+    addr: int
 
 
 @dataclass(frozen=True)
 class Instruction:
-    pass
+    opcode: int = field(repr=False, init=False)
+
+    def to_binary(self):
+        pass
 
 
 @dataclass(frozen=True)
 class Action(Instruction):
-    pass
+    def to_binary(self):
+        return f'{self.opcode:04X}{0:04X}'
 
 
 @dataclass(frozen=True)
 class Command(Instruction):
     arg: Any
 
+    def to_binary(self):
+        return f'{self.opcode:04X}{self.arg:04X}'
+
 
 @dataclass(frozen=True)
-class _Halt(Action):
+class Halt(Action):
+    opcode = 0x7
+
+
+@dataclass(frozen=True)
+class Input(Action):
+    opcode = 0x5
+
+
+@dataclass(frozen=True)
+class Output(Action):
+    opcode = 0x6
+
+
+@dataclass(frozen=True)
+class Clear(Action):
+    opcode = 0xA
+
+
+@dataclass(frozen=True)
+class StoreX(Action):
+    opcode = 0x13
+
+
+@dataclass(frozen=True)
+class StoreY(Action):
+    opcode = 0x14
+
+
+@dataclass(frozen=True)
+class LoadX(Action):
+    opcode = 0x15
+
+
+@dataclass(frozen=True)
+class LoadY(Action):
+    opcode = 0x16
+
+
+@dataclass(frozen=True)
+class LoadY(Action):
     def __repr__(self):
-        return 'Halt'
+        return 'LoadY'
 
 
 @dataclass(frozen=True)
 class Push(Action):
-    def __repr__(self):
-        return 'Push'
+    opcode = 0xF
 
 
 @dataclass(frozen=True)
 class Pop(Action):
-    def __repr__(self):
-        return 'Pop'
+    opcode = 0x10
 
 
 @dataclass(frozen=True)
 class Store(Command):
-    pass
+    opcode = 0x2
 
 
 @dataclass(frozen=True)
 class Load(Command):
-    pass
+    opcode = 0x1
 
 
 @dataclass(frozen=True)
 class JnS(Command):
-    pass
+    opcode = 0x0
 
 
 @dataclass(frozen=True)
@@ -81,50 +126,52 @@ class Hex(Command):
 
 @dataclass(frozen=True)
 class Add(Command):
-    pass
+    opcode = 0x3
 
 
 @dataclass(frozen=True)
 class Subt(Command):
-    pass
+    opcode = 0x4
 
 
 @dataclass(frozen=True)
 class Skipcond(Command):
-    pass
+    opcode = 0x8
 
 
 @dataclass(frozen=True)
 class Jump(Command):
-    pass
+    opcode = 0x9
+
+
+@dataclass(frozen=True)
+class JumpI(Command):
+    opcode = 0xC
 
 
 @dataclass(frozen=True)
 class AddI(Command):
-    pass
+    opcode = 0xB
 
 
 @dataclass(frozen=True)
 class LoadI(Command):
-    pass
+    opcode = 0xE
 
 
 @dataclass(frozen=True)
 class StoreI(Command):
-    pass
+    opcode = 0xD
 
 
 @dataclass(frozen=True)
 class ShiftL(Command):
-    pass
+    opcode = 0x11
 
 
 @dataclass(frozen=True)
 class ShiftR(Command):
-    pass
-
-
-Halt = _Halt()
+    opcode = 0x12
 
 
 @dataclass(frozen=True)

@@ -15,15 +15,14 @@ def p_program(p):
     program : instructions
     '''
     instructions = []
-    labels = {}
+    labels = set()
     for ast_obj in p[1]:
         if isinstance(ast_obj, ast_types.Label):
             if ast_obj.name in labels:
                 raise NameError(f'Redefined label: {ast_obj.name}')
-            labels[ast_obj.name] = ast_obj.target.eval()
-        else:
-            instructions.append(ast_obj)
-    p[0] = ast_types.Program(instructions=instructions, labels=labels)
+            labels.add(ast_obj.name)
+        instructions.append(ast_obj)
+    p[0] = p[1]
 
 
 def p_instructions_instruction(p):
@@ -61,7 +60,7 @@ def p_complex_instruction(p):
 
 def p_label_definition(p):
     'label_definition : LABEL number_definition'
-    p[0] = ast_types.Label(name=p[1][:-1], target=p[2])
+    p[0] = ast_types.Label(name=p[1][:-1], addr=p.lexer.lineno)
 
 
 def p_number_definition(p):
@@ -77,7 +76,7 @@ def p_action(p):
     action : HALT
             | INPUT
     '''
-    p[0] = _get_ast_obj(p[1])
+    p[0] = _get_ast_obj(p[1])()
 
 
 def p_command(p):
@@ -110,3 +109,5 @@ Store THERE
 Load 10
 Halt
 '''
+prog = parser.parse(code)
+print(prog)

@@ -85,8 +85,13 @@ t_STOREX = r'StoreX'
 t_STOREY = r'StoreY'
 t_DEC = r'DEC'
 t_HEX = r'HEX'
-t_NEWLINE = r'\n+'
 t_ignore = ' \t'
+
+
+def t_NEWLINE(t):
+    r'\n+'
+    t.lexer.lineno += 1  # lineno represents memory address
+    return t
 
 
 def t_LABEL(t):
