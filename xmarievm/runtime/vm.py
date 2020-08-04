@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, NamedTuple
 
 from xmarievm.parsing.ast_types import Program
 
@@ -30,3 +30,7 @@ class MarieVm:
         last_addr = 0
         for i in program.instructions:
             self.memory[last_addr] = i
+            last_addr += 1
+
+    def _fetch_instruction(self) -> int:
+        return self.memory[self.PC]

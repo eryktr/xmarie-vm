@@ -3,24 +3,6 @@ from typing import Any, List, Dict
 
 
 @dataclass(frozen=True)
-class NumberDefinition:
-    val: Any
-
-    def eval(self):
-        return int(self.val)
-
-
-@dataclass(frozen=True)
-class HEX(NumberDefinition):
-    pass
-
-
-@dataclass(frozen=True)
-class DEC(NumberDefinition):
-    pass
-
-
-@dataclass(frozen=True)
 class Label:
     name: str
     addr: int
@@ -30,22 +12,22 @@ class Label:
 class Instruction:
     opcode: int = field(repr=False, init=False)
 
-    def to_binary(self):
+    def to_hex(self):
         pass
 
 
 @dataclass(frozen=True)
 class Action(Instruction):
-    def to_binary(self):
-        return f'{self.opcode:04X}{0:04X}'
+    def to_hex(self):
+        return f'{self.opcode:02X}{0:02X}'
 
 
 @dataclass(frozen=True)
 class Command(Instruction):
     arg: Any
 
-    def to_binary(self):
-        return f'{self.opcode:04X}{self.arg:04X}'
+    def to_hex(self):
+        return f'{self.opcode:02X}{self.arg:02X}'
 
 
 @dataclass(frozen=True)
@@ -86,12 +68,6 @@ class LoadX(Action):
 @dataclass(frozen=True)
 class LoadY(Action):
     opcode = 0x16
-
-
-@dataclass(frozen=True)
-class LoadY(Action):
-    def __repr__(self):
-        return 'LoadY'
 
 
 @dataclass(frozen=True)
@@ -176,5 +152,5 @@ class ShiftR(Command):
 
 @dataclass(frozen=True)
 class Program:
-    instructions: List[Instruction]
+    instructions: List[int]
     labels: Dict[str, int]
