@@ -1,6 +1,8 @@
-from typing import List, NamedTuple
+from typing import List
 
 from xmarievm.parsing.ast_types import Program
+from xmarievm.runtime.decoder import decode_instruction
+from xmarievm.runtime.input_stream import InputStream
 
 
 class MarieVm:
@@ -12,8 +14,9 @@ class MarieVm:
     MBR: int
     stack: List[int]
     memory: List[int]
+    running: bool
 
-    def __init__(self, memory: List[int]):
+    def __init__(self, memory: List[int], input_stream: InputStream):
         self.AC = 0
         self.PC = 0
         self.X = 0
@@ -22,9 +25,15 @@ class MarieVm:
         self.MBR = 0
 
         self.memory = memory
+        self.input_stream = input_stream
+        self.running = False
 
     def execute(self, program: Program) -> None:
-        pass
+        self._load_into_memory(program)
+        self.running = True
+        while self.running:
+            instr = self._fetch_instruction()
+            decoded_instr = decode_instruction(instr)
 
     def _load_into_memory(self, program: Program) -> None:
         last_addr = 0
@@ -32,5 +41,67 @@ class MarieVm:
             self.memory[last_addr] = i
             last_addr += 1
 
+    def _get_value_at(self, addr: int):
+        return self.memory[addr]
+
     def _fetch_instruction(self) -> int:
         return self.memory[self.PC]
+
+    def _jns(self, target):
+        self.MAR = target
+        self.MBR = self.PC + 1
+        self.memory[self.MAR] = self.MBR
+        self.AC = target + 1
+        self.PC = self.AC
+
+    def _jump(self, target):
+        self.PC = target
+
+    def _load(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.AC = self.MBR
+
+    def _loadi(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.MAR = self.MBR
+        self.MBR = self._get_value_at(self.MAR)
+        self.AC = self.MBR
+
+    def _store(self, target):
+        self.MAR = target
+        self.MBR = self.AC
+        self.memory[self.MAR] = self.MBR
+
+    def _subt(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.AC = self.AC - self.MBR
+
+    def _add(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.AC = self.AC + self.MBR
+
+    def _addi(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.MAR = self.MBR
+        self.MBR = self._get_value_at(self.MAR)
+        self.AC = self.AC + self.MBR
+
+    def _subti(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.MAR = self.MBR
+        self.MBR = self._get_value_at(self.MAR)
+        self.AC = self.AC - self.MBR
+
+    def _skipcond(self, target):
+        ac = self.AC
+        skipnext = (target == 0 and ac < 0
+                    or target == 400 and ac == 0
+                    or target == 800 and ac > 0)
+        if skipnext:
+            self.PC += 1

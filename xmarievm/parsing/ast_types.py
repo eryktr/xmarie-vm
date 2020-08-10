@@ -19,7 +19,7 @@ class Instruction:
 @dataclass(frozen=True)
 class Action(Instruction):
     def to_hex(self):
-        return f'{self.opcode:02X}{0:02X}'
+        return f'{self.opcode:02X}{0:03X}'
 
 
 @dataclass(frozen=True)
@@ -27,7 +27,7 @@ class Command(Instruction):
     arg: Any
 
     def to_hex(self):
-        return f'{self.opcode:02X}{self.arg:02X}'
+        return f'{self.opcode:02X}{self.arg:03X}'
 
 
 @dataclass(frozen=True)
