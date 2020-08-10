@@ -2,155 +2,162 @@ from dataclasses import dataclass, field
 from typing import Any, List, Dict
 
 
-@dataclass(frozen=True)
+@dataclass
 class Label:
     name: str
     addr: int
 
 
-@dataclass(frozen=True)
+@dataclass
 class Instruction:
     opcode: int = field(repr=False, init=False)
+    arg: Any
 
     def to_hex(self):
         pass
 
 
-@dataclass(frozen=True)
+@dataclass
 class Action(Instruction):
+    arg: Any = 0
+
     def to_hex(self):
         return f'{self.opcode:02X}{0:03X}'
 
 
-@dataclass(frozen=True)
+@dataclass
 class Command(Instruction):
-    arg: Any
 
     def to_hex(self):
         return f'{self.opcode:02X}{self.arg:03X}'
 
 
-@dataclass(frozen=True)
+@dataclass
 class Halt(Action):
     opcode = 0x7
 
 
-@dataclass(frozen=True)
+@dataclass
 class Input(Action):
     opcode = 0x5
 
 
-@dataclass(frozen=True)
+@dataclass
 class Output(Action):
     opcode = 0x6
 
 
-@dataclass(frozen=True)
+@dataclass
 class Clear(Action):
     opcode = 0xA
 
 
-@dataclass(frozen=True)
+@dataclass
 class StoreX(Action):
     opcode = 0x13
 
 
-@dataclass(frozen=True)
+@dataclass
 class StoreY(Action):
     opcode = 0x14
 
 
-@dataclass(frozen=True)
+@dataclass
 class LoadX(Action):
     opcode = 0x15
 
 
-@dataclass(frozen=True)
+@dataclass
 class LoadY(Action):
     opcode = 0x16
 
 
-@dataclass(frozen=True)
+@dataclass
 class Push(Action):
     opcode = 0xF
 
 
-@dataclass(frozen=True)
+@dataclass
 class Pop(Action):
     opcode = 0x10
 
 
-@dataclass(frozen=True)
+@dataclass
 class Store(Command):
     opcode = 0x2
 
 
-@dataclass(frozen=True)
+@dataclass
 class Load(Command):
     opcode = 0x1
 
 
-@dataclass(frozen=True)
+@dataclass
 class JnS(Command):
     opcode = 0x0
 
 
-@dataclass(frozen=True)
-class Hex(Command):
+@dataclass
+class HEX(Command):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass
+class DEC(Command):
+    pass
+
+
+@dataclass
 class Add(Command):
     opcode = 0x3
 
 
-@dataclass(frozen=True)
+@dataclass
 class Subt(Command):
     opcode = 0x4
 
 
-@dataclass(frozen=True)
+@dataclass
 class Skipcond(Command):
     opcode = 0x8
 
 
-@dataclass(frozen=True)
+@dataclass
 class Jump(Command):
     opcode = 0x9
 
 
-@dataclass(frozen=True)
+@dataclass
 class JumpI(Command):
     opcode = 0xC
 
 
-@dataclass(frozen=True)
+@dataclass
 class AddI(Command):
     opcode = 0xB
 
 
-@dataclass(frozen=True)
+@dataclass
 class LoadI(Command):
     opcode = 0xE
 
 
-@dataclass(frozen=True)
+@dataclass
 class StoreI(Command):
     opcode = 0xD
 
 
-@dataclass(frozen=True)
+@dataclass
 class ShiftL(Command):
     opcode = 0x11
 
 
-@dataclass(frozen=True)
+@dataclass
 class ShiftR(Command):
     opcode = 0x12
 
 
-@dataclass(frozen=True)
+@dataclass
 class Program:
     instructions: List[int]
     labels: Dict[str, int]

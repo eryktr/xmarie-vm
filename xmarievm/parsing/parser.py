@@ -1,6 +1,8 @@
 import ply.yacc as yacc
 
 import xmarievm.parsing.ast_types as ast_types
+from xmarievm.parsing import translator
+from xmarievm.parsing.ast_types import Program
 from xmarievm.parsing.lexer import tokens
 
 instructions = []
@@ -15,14 +17,16 @@ def p_program(p):
     program : instructions
     '''
     instructions = []
-    labels = set()
+    labels = {}
     for ast_obj in p[1]:
         if isinstance(ast_obj, ast_types.Label):
             if ast_obj.name in labels:
                 raise NameError(f'Redefined label: {ast_obj.name}')
-            labels.add(ast_obj.name)
-        instructions.append(ast_obj)
-    p[0] = p[1]
+            labels[ast_obj.name] = ast_obj.addr
+        else:
+            instructions.append(ast_obj)
+    encoded_instructons = translator.translate(instructions, labels)
+    p[0] = Program(encoded_instructons, labels)
 
 
 def p_instructions_instruction(p):
@@ -83,6 +87,9 @@ def p_command(p):
     '''
     command : STORE
             | LOAD
+            | ADD
+            | SUBT
+            | SKIPCOND
     '''
     p[0] = p[1]
 
@@ -97,17 +104,17 @@ def p_arg(p):
 
 parser = yacc.yacc(write_tables=False, debug=False)
 
-code = '''\
-Load X
-Store Y
-
-MyLabel, HEX 0x20
-MyAnotherLabel, DEC 20
-TurboHex, HEX 0xAA
-Load Z
-Store THERE
-Load 10
-Halt
-'''
-prog = parser.parse(code)
-print(prog)
+# code = '''\
+# Load 20
+# Store Y
+#
+# MyLabel, HEX 0x20
+# MyAnotherLabel, DEC 20
+# TurboHex, HEX 0xAA
+# Load Z
+# Store THERE
+# Load 10
+# Halt
+# '''
+# prog = parser.parse(code)
+# print(prog)
