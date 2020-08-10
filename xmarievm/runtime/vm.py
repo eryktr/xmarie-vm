@@ -120,5 +120,9 @@ class MarieVm:
             return self._load
         if opcode == 0x2:
             return self._store
+        if opcode == 0x4:
+            return self._subt
         if opcode == 0x7:
             return self._halt
+        if opcode == 0x8:
+            return self._skipcond

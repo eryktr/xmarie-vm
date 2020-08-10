@@ -12,6 +12,6 @@ X, HEX 0x20
 Skipcond 400
 Halt
 '''
-    vm = MarieVm(memory=[0] * 30, input_stream=StandardInputStream())
+    vm = MarieVm(memory=[0] * 1024, input_stream=StandardInputStream())
     program = parser.parse(code)
     vm.execute(program)
