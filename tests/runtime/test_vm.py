@@ -102,12 +102,50 @@ def test_skipcond_000(vm):
 Load X
 Skipcond 000
 Add Y
+Add Z
 Halt
 X, HEX 0xFFFFF
 Y, HEX 0x00003
+Z, HEX 0x00004
 '''
     program = parser.parse(code)
 
     vm.execute(program)
 
-    assert vm.AC == -1
+    assert vm.AC == 3
+
+
+def test_skipcond_400(vm):
+    code = '''\
+Load X
+Skipcond 400
+Add Y
+Add Z
+Halt
+X, HEX 0x00000
+Y, HEX 0x00003
+Z, HEX 0x00001
+'''
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 1
+
+
+def test_skipcond_800(vm):
+    code = '''\
+    Load X
+    Skipcond 800
+    Add Y
+    Add Z
+    Halt
+    X, HEX 0x00001
+    Y, HEX 0x00003
+    Z, HEX 0x00001
+    '''
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 2
