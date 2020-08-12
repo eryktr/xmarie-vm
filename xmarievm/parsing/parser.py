@@ -3,7 +3,8 @@ import ply.yacc as yacc
 import xmarievm.parsing.ast_types as ast_types
 from xmarievm.parsing import translator
 from xmarievm.parsing.ast_types import Program
-from xmarievm.parsing.lexer import tokens
+from xmarievm.const import MAX_DEC, MEM_BITSIZE
+from xmarievm.parsing.lexer import tokens, lexer
 
 instructions = []
 
@@ -23,6 +24,7 @@ def p_program(p):
             if ast_obj.name in labels:
                 raise NameError(f'Redefined label: {ast_obj.name}')
             labels[ast_obj.name] = ast_obj.addr
+            instructions.append(ast_obj.val)
         else:
             instructions.append(ast_obj)
     encoded_instructons = translator.translate(instructions, labels)
@@ -64,7 +66,7 @@ def p_complex_instruction(p):
 
 def p_label_definition(p):
     'label_definition : LABEL number_definition'
-    p[0] = ast_types.Label(name=p[1][:-1], addr=p.lexer.lineno)
+    p[0] = ast_types.Label(name=p[1][:-1], addr=p.lexer.lineno - 1, val=p[2])
 
 
 def p_number_definition(p):
@@ -72,6 +74,10 @@ def p_number_definition(p):
     number_definition : HEX HEXNUM NEWLINE
                       | DEC NUM NEWLINE
     '''
+    if p[1] == 'Dec' and int(p[2]) > MAX_DEC:
+        raise ValueError(f'Maximum integer value: {MAX_DEC} exceeded.')
+    if p[1] == 'Hex' and len(p[2]) > 7:
+        raise ValueError(f'Maximum variable length: {MEM_BITSIZE} exceeded')
     p[0] = _get_ast_obj(p[1])(p[2])
 
 
@@ -90,6 +96,9 @@ def p_command(p):
             | ADD
             | SUBT
             | SKIPCOND
+            | CLEAR
+            | ADDI
+            | SUBTI
     '''
     p[0] = p[1]
 
@@ -102,7 +111,12 @@ def p_arg(p):
     p[0] = p[1]
 
 
-parser = yacc.yacc(write_tables=False, debug=False)
+_parser = yacc.yacc(write_tables=False, debug=False)
+
+
+def parse(code):
+    lexer.lineno = 0
+    return _parser.parse(code)
 
 # code = '''\
 # Load 20

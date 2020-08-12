@@ -1,6 +1,6 @@
 from typing import List, Callable
 
-from xmarievm.parsing.ast_types import Program, Load
+from xmarievm.parsing.ast_types import Program
 from xmarievm.runtime.decoder import decode_instruction
 from xmarievm.runtime.input_stream import InputStream
 
@@ -35,7 +35,6 @@ class MarieVm:
             instr = self._fetch_instruction()
             decoded_instr = decode_instruction(instr)
             action = self._get_action(decoded_instr.opcode)
-            print(action.__name__)
             action(decoded_instr.arg)
             self.PC += 1
 
@@ -120,9 +119,15 @@ class MarieVm:
             return self._load
         if opcode == 0x2:
             return self._store
+        if opcode == 0x3:
+            return self._add
         if opcode == 0x4:
             return self._subt
         if opcode == 0x7:
             return self._halt
         if opcode == 0x8:
             return self._skipcond
+        if opcode == 0xB:
+            return self._addi
+        if opcode == 0x13:
+            return self._subti

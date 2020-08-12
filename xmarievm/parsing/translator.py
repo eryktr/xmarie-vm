@@ -14,5 +14,5 @@ def translate(instructions: List[Instruction], labels: Dict[str, int]) -> List[i
                 i.arg = labels[i.arg]
             except KeyError:
                 raise ValueError(f'Undefined label: {i.arg}')
-        encoded_instructions.append(int(i.to_hex(), 16))
+        encoded_instructions.append(i.translate())
     return encoded_instructions

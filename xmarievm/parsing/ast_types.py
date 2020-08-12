@@ -1,11 +1,14 @@
 from dataclasses import dataclass, field
 from typing import Any, List, Dict
 
+from xmarievm.const import MEM_BITSIZE
+
 
 @dataclass
 class Label:
     name: str
     addr: int
+    val: 'Instruction'
 
 
 @dataclass
@@ -13,7 +16,7 @@ class Instruction:
     opcode: int = field(repr=False, init=False)
     arg: Any
 
-    def to_hex(self):
+    def translate(self):
         pass
 
 
@@ -21,15 +24,15 @@ class Instruction:
 class Action(Instruction):
     arg: Any = 0
 
-    def to_hex(self):
-        return f'{self.opcode:02X}{0:03X}'
+    def translate(self):
+        return int(f'{self.opcode:02X}{0:03X}', 16)
 
 
 @dataclass
 class Command(Instruction):
 
-    def to_hex(self):
-        return f'{self.opcode:02X}{self.arg:03X}'
+    def translate(self):
+        return int(f'{self.opcode:02X}{self.arg:03X}', 16)
 
 
 @dataclass
@@ -99,12 +102,15 @@ class JnS(Command):
 
 @dataclass
 class HEX(Command):
-    pass
+    def translate(self):
+        sign = self.arg >> (MEM_BITSIZE - 1)
+        return self.arg - ((1 << MEM_BITSIZE) if sign else 0)
 
 
 @dataclass
 class DEC(Command):
-    pass
+    def translate(self):
+        return self.arg
 
 
 @dataclass
@@ -155,6 +161,11 @@ class ShiftL(Command):
 @dataclass
 class ShiftR(Command):
     opcode = 0x12
+
+
+@dataclass
+class SubtI(Command):
+    opcode = 0x13
 
 
 @dataclass

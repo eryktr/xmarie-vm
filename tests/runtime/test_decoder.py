@@ -29,7 +29,7 @@ def test_decode_instruction(instr, opcode, arg):
     (Skipcond(0), 0),
 ))
 def test_decode_and_translate(instr, arg):
-    encoded_instr = translator.translate([instr])[0]
+    encoded_instr = translator.translate([instr], labels={})[0]
     decoded_instr = decode_instruction(encoded_instr)
 
     assert decoded_instr.opcode == instr.opcode

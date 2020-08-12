@@ -1,7 +1,6 @@
 from typing import NamedTuple
 
-OPCODE_LEN_BITS = 8
-ARG_LEN_BITS = 12
+from xmarievm.const import OPCODE_LEN_BITS, ARG_LEN_BITS
 
 
 class InMemoryInstruction(NamedTuple):
