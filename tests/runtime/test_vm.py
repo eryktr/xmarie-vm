@@ -1,6 +1,6 @@
 import pytest
 import xmarievm.parsing.parser as parser
-from xmarievm.runtime.input_stream import StandardInputStream
+from xmarievm.runtime.input_stream import StandardInputStream, BufferedInputStream
 from xmarievm.runtime.vm import MarieVm
 
 
@@ -166,14 +166,32 @@ def test_overflow(vm):
     assert vm.AC == -3
 
 
-# def test_jump(vm):
-#     code = '''\
-#     Load X
-#     loop, Load Y
-#     Halt
-#     X, 10
-#     Y, 20
-#     '''
-#     program = parser.parse(code)
-#
-#     vm.execute(program)
+def test_jump(vm):
+    code = '''\
+            Load X
+            Jump here
+            Add Y
+    here,   Add Z
+            Halt
+    X,      DEC 0
+    Y,      DEC 5
+    Z,      DEC 10
+    '''
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 10
+
+
+def test_input():
+    code = '''\
+    Input
+    Halt
+    '''
+    vm = MarieVm(memory=[0] * 1024, input_stream=BufferedInputStream('0x20'))
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 0x20

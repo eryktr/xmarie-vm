@@ -54,6 +54,14 @@ def p_instruction(p):
     p[0] = p[1]
 
 
+def p_strict_instruction(p):
+    '''
+    strict_instruction : single_instruction
+                       | complex_instruction
+    '''
+    p[0] = p[1]
+
+
 def p_single_instruction(p):
     'single_instruction : action NEWLINE'
     p[0] = p[1]
@@ -67,6 +75,7 @@ def p_complex_instruction(p):
 def p_label_definition(p):
     '''
     label_definition : LABEL number_definition
+                    | LABEL strict_instruction
     '''
 
     p[0] = ast_types.Label(name=p[1][:-1], addr=p.lexer.lineno - 1, val=p[2])
@@ -102,6 +111,7 @@ def p_command(p):
             | CLEAR
             | ADDI
             | SUBTI
+            | JUMP
     '''
     p[0] = p[1]
 

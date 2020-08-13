@@ -16,6 +16,7 @@ class MarieVm:
     MBR: int
     stack: List[int]
     memory: List[int]
+    input_stream: InputStream
     running: bool
 
     def __init__(self, memory: List[int], input_stream: InputStream):
@@ -68,7 +69,10 @@ class MarieVm:
         self.PC = self.AC
 
     def _jump(self, target):
-        self.PC = target
+        """
+        PC increases automatically after each instr, -1 ensures instr jumped to gets executed
+        """
+        self.PC = target - 1
 
     def _load(self, target):
         self.MAR = target
@@ -111,6 +115,10 @@ class MarieVm:
         self.MBR = self._get_value_at(self.MAR)
         self.AC = self.AC - self.MBR
 
+    def _input(self, target):
+        val = self.input_stream.read()
+        self.AC = int_from_2c(int(val, 16), MEM_BITSIZE)
+
     def _skipcond(self, target):
         ac = self.AC
         skipnext = (target == 0 and ac < 0
@@ -133,10 +141,14 @@ class MarieVm:
             return self._add
         if opcode == 0x4:
             return self._subt
+        if opcode == 0x5:
+            return self._input
         if opcode == 0x7:
             return self._halt
         if opcode == 0x8:
             return self._skipcond
+        if opcode == 0x9:
+            return self._jump
         if opcode == 0xB:
             return self._addi
         if opcode == 0x13:
