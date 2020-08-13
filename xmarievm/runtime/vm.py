@@ -1,8 +1,10 @@
 from typing import List, Callable
 
+from xmarievm.const import MAX_DEC, MEM_BITSIZE
 from xmarievm.parsing.ast_types import Program
 from xmarievm.runtime.decoder import decode_instruction
 from xmarievm.runtime.input_stream import InputStream
+from xmarievm.util import int_from_2c
 
 
 class MarieVm:
@@ -17,7 +19,7 @@ class MarieVm:
     running: bool
 
     def __init__(self, memory: List[int], input_stream: InputStream):
-        self.AC = 0
+        self._AC = 0
         self.PC = 0
         self.X = 0
         self.Y = 0
@@ -27,6 +29,14 @@ class MarieVm:
         self.memory = memory
         self.input_stream = input_stream
         self.running = False
+
+    @property
+    def AC(self):
+        return self._AC
+
+    @AC.setter
+    def AC(self, val):
+        self._AC = int_from_2c(val, MEM_BITSIZE)
 
     def execute(self, program: Program) -> None:
         self._load_into_memory(program)

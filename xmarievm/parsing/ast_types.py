@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, List, Dict
 
 from xmarievm.const import MEM_BITSIZE
+from xmarievm.util import int_from_2c
 
 
 @dataclass
@@ -103,8 +104,7 @@ class JnS(Command):
 @dataclass
 class HEX(Command):
     def translate(self):
-        sign = self.arg >> (MEM_BITSIZE - 1)
-        return self.arg - ((1 << MEM_BITSIZE) if sign else 0)
+        return int_from_2c(self.arg, MEM_BITSIZE)
 
 
 @dataclass

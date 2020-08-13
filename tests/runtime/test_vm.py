@@ -149,3 +149,31 @@ def test_skipcond_800(vm):
     vm.execute(program)
 
     assert vm.AC == 2
+
+
+def test_overflow(vm):
+    code = '''\
+    Load X
+    Add Y
+    Halt
+    X, DEC 524287
+    Y, DEC 524286
+    '''
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == -3
+
+
+# def test_jump(vm):
+#     code = '''\
+#     Load X
+#     loop, Load Y
+#     Halt
+#     X, 10
+#     Y, 20
+#     '''
+#     program = parser.parse(code)
+#
+#     vm.execute(program)
