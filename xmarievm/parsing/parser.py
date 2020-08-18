@@ -97,6 +97,8 @@ def p_action(p):
     '''
     action : HALT
             | INPUT
+            | OUTPUT
+            | CLEAR
     '''
     p[0] = _get_ast_obj(p[1])()
 
@@ -108,10 +110,11 @@ def p_command(p):
             | ADD
             | SUBT
             | SKIPCOND
-            | CLEAR
             | ADDI
             | SUBTI
             | JUMP
+            | SHIFTL
+            | SHIFTR
     '''
     p[0] = p[1]
 
@@ -129,7 +132,7 @@ _parser = yacc.yacc(write_tables=False, debug=False)
 
 def parse(code):
     lexer.lineno = 0
-    return _parser.parse(code)
+    return _parser.parse(code.lstrip())
 
 # code = '''\
 # Load 20

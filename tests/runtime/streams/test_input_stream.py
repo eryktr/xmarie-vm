@@ -1,7 +1,6 @@
 import pytest
 
-from xmarievm.runtime.input_stream import BufferedInputStream, StandardInputStream
-import xmarievm.runtime.input_stream as input_stream
+from xmarievm.runtime.streams.input_stream import BufferedInputStream, StandardInputStream
 
 
 def test_buffered_input_stream():

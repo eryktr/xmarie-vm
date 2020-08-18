@@ -1,10 +1,11 @@
 from typing import List, Callable
 
-from xmarievm.const import MAX_DEC, MEM_BITSIZE
+from xmarievm.const import MEM_BITSIZE
 from xmarievm.parsing.ast_types import Program
 from xmarievm.runtime.decoder import decode_instruction
-from xmarievm.runtime.input_stream import InputStream
-from xmarievm.util import int_from_2c
+from xmarievm.runtime.streams.input_stream import InputStream
+from xmarievm.runtime.streams.output_stream import OutputStream
+from xmarievm.util import int_from_2c, int_in_2c_to_hex
 
 
 class MarieVm:
@@ -17,9 +18,10 @@ class MarieVm:
     stack: List[int]
     memory: List[int]
     input_stream: InputStream
+    output_stream: OutputStream
     running: bool
 
-    def __init__(self, memory: List[int], input_stream: InputStream):
+    def __init__(self, memory: List[int], input_stream: InputStream, output_stream: OutputStream):
         self._AC = 0
         self.PC = 0
         self.X = 0
@@ -29,6 +31,7 @@ class MarieVm:
 
         self.memory = memory
         self.input_stream = input_stream
+        self.output_stream = output_stream
         self.running = False
 
     @property
@@ -101,6 +104,16 @@ class MarieVm:
         self.MBR = self._get_value_at(self.MAR)
         self.AC = self.AC + self.MBR
 
+    def _shiftl(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.AC = self.AC << self.MBR
+
+    def _shiftr(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.AC = self.AC >> self.MBR
+
     def _addi(self, target):
         self.MAR = target
         self.MBR = self._get_value_at(self.MAR)
@@ -115,9 +128,15 @@ class MarieVm:
         self.MBR = self._get_value_at(self.MAR)
         self.AC = self.AC - self.MBR
 
+    def _clear(self, target):
+        self.AC = 0
+
     def _input(self, target):
         val = self.input_stream.read()
         self.AC = int_from_2c(int(val, 16), MEM_BITSIZE)
+
+    def _output(self, target):
+        self.output_stream.write(int_in_2c_to_hex(self.AC, MEM_BITSIZE))
 
     def _skipcond(self, target):
         ac = self.AC
@@ -143,13 +162,21 @@ class MarieVm:
             return self._subt
         if opcode == 0x5:
             return self._input
+        if opcode == 0x6:
+            return self._output
         if opcode == 0x7:
             return self._halt
         if opcode == 0x8:
             return self._skipcond
         if opcode == 0x9:
             return self._jump
+        if opcode == 0xA:
+            return self._clear
         if opcode == 0xB:
             return self._addi
+        if opcode == 0x11:
+            return self._shiftl
+        if opcode == 0x12:
+            return self._shiftr
         if opcode == 0x13:
             return self._subti

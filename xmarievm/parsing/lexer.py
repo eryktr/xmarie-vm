@@ -91,7 +91,7 @@ t_ignore = ' \t'
 
 
 def t_NEWLINE(t):
-    r'\n+'
+    r'\n\s*'
     t.lexer.lineno += 1  # lineno represents memory address
     return t
 

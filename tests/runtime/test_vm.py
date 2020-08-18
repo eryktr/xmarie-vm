@@ -1,12 +1,14 @@
 import pytest
+
 import xmarievm.parsing.parser as parser
-from xmarievm.runtime.input_stream import StandardInputStream, BufferedInputStream
+from xmarievm.runtime.streams.input_stream import StandardInputStream, BufferedInputStream
+from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.runtime.vm import MarieVm
 
 
 @pytest.fixture
 def vm():
-    return MarieVm(memory=[0] * 1024, input_stream=StandardInputStream())
+    return MarieVm(memory=[0] * 1024, input_stream=StandardInputStream(), output_stream=OutputStream())
 
 
 def test_load_label_hex(vm):
@@ -184,14 +186,89 @@ def test_jump(vm):
     assert vm.AC == 10
 
 
-def test_input():
+@pytest.mark.parametrize('input_, acc', (
+    ('0x20', 0x20),
+    ('0xFFFFF', -1),
+    ('0xFFFFE', -2),
+    ('0x000FF', 255),
+))
+def test_input(input_, acc):
     code = '''\
     Input
     Halt
     '''
-    vm = MarieVm(memory=[0] * 1024, input_stream=BufferedInputStream('0x20'))
+    vm = MarieVm(memory=[0] * 1024, input_stream=BufferedInputStream(input_), output_stream=OutputStream())
     program = parser.parse(code)
 
     vm.execute(program)
 
-    assert vm.AC == 0x20
+    assert vm.AC == acc
+
+
+@pytest.mark.parametrize('output, buf', (
+    ('0x10', ['0x10']),
+    ('0xFFFFF', ['0xFFFFF']),
+))
+def test_output(vm, output, buf):
+    code = f'''
+    Load X
+    Output
+    Halt
+    X, HEX {output}
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.output_stream.buf == buf
+
+
+def test_shiftl(vm):
+    code = '''
+    Load X
+    ShiftL Y
+    Halt
+    
+    X, DEC 2
+    Y, DEC 3
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 16
+
+
+def test_shiftr(vm):
+    code = '''
+    Load X
+    ShiftR Y
+    Halt
+    
+    
+    X, DEC 8
+    Y, DEC 1
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 4
+
+
+def test_clear(vm):
+    code = '''\
+    Load X
+    Clear
+    Halt
+    X, HEX 0x20
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 0
