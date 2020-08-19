@@ -2,6 +2,7 @@ from typing import List, Callable
 
 from xmarievm.const import MEM_BITSIZE
 from xmarievm.parsing.ast_types import Program
+import xmarievm.parsing.ast_types as ast_types
 from xmarievm.runtime.decoder import decode_instruction
 from xmarievm.runtime.streams.input_stream import InputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
@@ -21,7 +22,7 @@ class MarieVm:
     output_stream: OutputStream
     running: bool
 
-    def __init__(self, memory: List[int], input_stream: InputStream, output_stream: OutputStream):
+    def __init__(self, memory: List[int], input_stream: InputStream, output_stream: OutputStream, stack: List[int]):
         self._AC = 0
         self.PC = 0
         self.X = 0
@@ -30,6 +31,7 @@ class MarieVm:
         self.MBR = 0
 
         self.memory = memory
+        self.stack = stack
         self.input_stream = input_stream
         self.output_stream = output_stream
         self.running = False
@@ -89,6 +91,13 @@ class MarieVm:
         self.MBR = self._get_value_at(self.MAR)
         self.AC = self.MBR
 
+    def _storei(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.MAR = self.MBR
+        self.MBR = self._get_value_at(self.MAR)
+        self.memory[self.MBR] = self.AC
+
     def _store(self, target):
         self.MAR = target
         self.MBR = self.AC
@@ -128,6 +137,19 @@ class MarieVm:
         self.MBR = self._get_value_at(self.MAR)
         self.AC = self.AC - self.MBR
 
+    def _jumpi(self, target):
+        self.MAR = target
+        self.MBR = self._get_value_at(self.MAR)
+        self.MAR = self.MBR
+        self.MBR = self._get_value_at(self.MAR)
+        self.PC = self.MBR - 1  # PC increases by one per each instruction
+
+    def _incr(self, target):
+        self.AC += 1
+
+    def _decr(self, target):
+        self.AC -= 1
+
     def _clear(self, target):
         self.AC = 0
 
@@ -148,6 +170,12 @@ class MarieVm:
 
     def _halt(self, target):
         self.running = False
+
+    def _push(self, target):
+        self.stack.insert(0, self.AC)
+
+    def _pop(self, target):
+        self.stack.pop(0)
 
     def _get_action(self, opcode: int) -> Callable:
         if opcode == 0x0:
@@ -180,3 +208,15 @@ class MarieVm:
             return self._shiftr
         if opcode == 0x13:
             return self._subti
+        if opcode == ast_types.Incr.opcode:
+            return self._incr
+        if opcode == ast_types.Decr.opcode:
+            return self._decr
+        if opcode == ast_types.StoreI.opcode:
+            return self._storei
+        if opcode == ast_types.JumpI.opcode:
+            return self._jumpi
+        if opcode == ast_types.Push.opcode:
+            return self._push
+        if opcode == ast_types.Pop.opcode:
+            return self._pop

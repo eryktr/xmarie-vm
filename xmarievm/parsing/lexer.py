@@ -22,7 +22,8 @@ tokens = (
     'STOREI',
     'PUSH',
     'POP',
-    'INC',
+    'INCR',
+    'DECR',
     'SHIFTL',
     'SHIFTR',
     'STOREX',
@@ -62,6 +63,8 @@ reserved = {
     'Pop': 'POP',
     'ShiftL': 'SHIFTL',
     'ShiftR': 'SHIFTR',
+    'Incr': 'INCR',
+    'Decr': 'DECR',
 }
 
 t_JNS = r'JnS'

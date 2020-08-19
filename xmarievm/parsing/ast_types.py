@@ -169,6 +169,16 @@ class SubtI(Command):
 
 
 @dataclass
+class Incr(Action):
+    opcode = 0x17
+
+
+@dataclass
+class Decr(Action):
+    opcode = 0x18
+
+
+@dataclass
 class Program:
     instructions: List[int]
     labels: Dict[str, int]

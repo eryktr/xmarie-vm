@@ -8,7 +8,7 @@ from xmarievm.runtime.vm import MarieVm
 
 @pytest.fixture
 def vm():
-    return MarieVm(memory=[0] * 1024, input_stream=StandardInputStream(), output_stream=OutputStream())
+    return MarieVm(memory=[0] * 1024, input_stream=StandardInputStream(), output_stream=OutputStream(), stack=[])
 
 
 def test_load_label_hex(vm):
@@ -197,7 +197,7 @@ def test_input(input_, acc):
     Input
     Halt
     '''
-    vm = MarieVm(memory=[0] * 1024, input_stream=BufferedInputStream(input_), output_stream=OutputStream())
+    vm = MarieVm(memory=[0] * 1024, input_stream=BufferedInputStream(input_), output_stream=OutputStream(), stack=[])
     program = parser.parse(code)
 
     vm.execute(program)
@@ -272,3 +272,99 @@ def test_clear(vm):
     vm.execute(program)
 
     assert vm.AC == 0
+
+
+def test_incr(vm):
+    code = '''
+    Load X
+    Incr
+    Halt
+    
+    X, DEC 1
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 2
+
+
+def test_decr(vm):
+    code = '''
+    Load X
+    Decr
+    Halt
+
+    X, DEC 10
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 9
+
+
+def test_storei(vm):
+    code = '''
+    Load Y
+    StoreI X
+    Load X
+    Halt
+    
+    X, DEC 5
+    Y, DEC 4
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 4
+
+
+def test_jumpi(vm):
+    code = '''
+    Load X
+    JumpI Z
+    Add Y
+    Add Y
+    Add Y 
+    Halt
+    
+    X, DEC 5
+    Y, DEC 6
+    Z, DEC 6
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 5
+
+
+def test_push_and_pop(vm):
+    code = '''
+    Load X
+    Push
+    
+    Load Y
+    Push
+    
+    Load Z
+    Push
+    Pop
+    Halt
+    
+    X, HEX 0xFFFFF
+    Y, HEX 0xFFFFE
+    Z, HEX 0xFFFFD
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.stack == [-2, -1]
