@@ -71,7 +71,7 @@ class MarieVm:
         self.MBR = self.PC + 1
         self.memory[self.MAR] = self.MBR
         self.AC = target + 1
-        self.PC = self.AC
+        self.PC = self.AC - 1
 
     def _jump(self, target):
         """
@@ -140,8 +140,6 @@ class MarieVm:
     def _jumpi(self, target):
         self.MAR = target
         self.MBR = self._get_value_at(self.MAR)
-        self.MAR = self.MBR
-        self.MBR = self._get_value_at(self.MAR)
         self.PC = self.MBR - 1  # PC increases by one per each instruction
 
     def _incr(self, target):
@@ -176,6 +174,18 @@ class MarieVm:
 
     def _pop(self, target):
         self.stack.pop(0)
+
+    def _loadx(self, target):
+        self.AC = self.X
+
+    def _loady(self, target):
+        self.AC = self.Y
+
+    def _storex(self, target):
+        self.X = self.AC
+
+    def _storey(self, target):
+        self.Y = self.AC
 
     def _get_action(self, opcode: int) -> Callable:
         if opcode == 0x0:
@@ -220,3 +230,13 @@ class MarieVm:
             return self._push
         if opcode == ast_types.Pop.opcode:
             return self._pop
+        if opcode == ast_types.LoadI.opcode:
+            return self._loadi
+        if opcode == ast_types.StoreX.opcode:
+            return self._storex
+        if opcode == ast_types.StoreY.opcode:
+            return self._storey
+        if opcode == ast_types.LoadX.opcode:
+            return self._loadx
+        if opcode == ast_types.LoadY.opcode:
+            return self._loady

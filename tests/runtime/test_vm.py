@@ -335,7 +335,7 @@ def test_jumpi(vm):
     
     X, DEC 5
     Y, DEC 6
-    Z, DEC 6
+    Z, DEC 5
     '''
 
     program = parser.parse(code)
@@ -368,3 +368,109 @@ def test_push_and_pop(vm):
     vm.execute(program)
 
     assert vm.stack == [-2, -1]
+
+
+def test_loadi(vm):
+    code = '''
+    LoadI X
+    Halt
+    X, DEC 3
+    Z, DEC 99
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 99
+
+
+def test_storex(vm):
+    code = '''
+    Load X
+    StoreX
+    Halt
+    X, DEC 10
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.X == 10
+
+
+def test_storey(vm):
+    code = '''
+    Load X
+    StoreY
+    Halt
+    X, DEC 10
+    '''
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.Y == 10
+
+
+def test_loadx(vm):
+    code = '''
+    Load X
+    StoreX
+    Load Y
+    LoadX
+    Halt
+    
+    X, DEC 10
+    Y, DEC 20
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 10
+
+
+def test_loady(vm):
+    code = '''
+    Load X
+    StoreY
+    Load Y
+    LoadY
+    Halt
+
+    X, DEC 10
+    Y, DEC 20
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.AC == 10
+
+
+def test_jns(vm):
+    code = '''
+JnS PrintX
+JnS PrintX
+Halt
+
+PrintX, HEX 0x00000
+        Load X
+        StoreX
+        Output
+
+        JumpI PrintX
+
+        X, DEC 42
+'''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.output_stream.buf == ['0x2A', '0x2A']
+    assert vm.X == 42

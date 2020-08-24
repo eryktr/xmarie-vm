@@ -103,6 +103,10 @@ def p_action(p):
             | DECR
             | PUSH
             | POP
+            | STOREX
+            | STOREY
+            | LOADX
+            | LOADY
     '''
     p[0] = _get_ast_obj(p[1])()
 
@@ -112,6 +116,7 @@ def p_command(p):
     command : STORE
             | STOREI
             | LOAD
+            | LOADI
             | ADD
             | SUBT
             | SKIPCOND
@@ -121,6 +126,7 @@ def p_command(p):
             | JUMPI
             | SHIFTL
             | SHIFTR
+            | JNS
     '''
     p[0] = p[1]
 

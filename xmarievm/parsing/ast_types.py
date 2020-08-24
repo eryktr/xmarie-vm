@@ -58,7 +58,7 @@ class Clear(Action):
 
 @dataclass
 class StoreX(Action):
-    opcode = 0x13
+    opcode = 0x19
 
 
 @dataclass
