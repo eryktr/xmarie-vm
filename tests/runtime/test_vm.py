@@ -474,3 +474,28 @@ PrintX, HEX 0x00000
 
     assert vm.output_stream.buf == ['0x2A', '0x2A']
     assert vm.X == 42
+
+
+def test_profiling_stats(vm):
+    code = '''
+    Load X
+    StoreY
+    Load Y
+    LoadY
+    Halt
+
+    X, DEC 10
+    Y, DEC 20
+    '''
+
+    program = parser.parse(code)
+
+    vm.execute(program)
+
+    assert vm.cost_of_executed_instrs == 9
+    assert vm.instr_to_call_count == {
+        'Load': 2,
+        'Halt': 1,
+        'StoreY': 1,
+        'LoadY': 1,
+    }

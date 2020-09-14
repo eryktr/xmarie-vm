@@ -1,4 +1,7 @@
+import inspect
+import sys
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any, List, Dict
 
 from xmarievm.const import MEM_BITSIZE
@@ -182,3 +185,13 @@ class Decr(Action):
 class Program:
     instructions: List[int]
     labels: Dict[str, int]
+
+
+@lru_cache(maxsize=32)
+def get_instr_name_by_opcode(opcode: int) -> str:
+    clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+    for name, obj in clsmembers:
+        if not hasattr(obj, 'opcode'):
+            continue
+        if obj.opcode == opcode:
+            return name

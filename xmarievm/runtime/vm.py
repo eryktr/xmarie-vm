@@ -1,12 +1,42 @@
-from typing import List, Callable
+from collections import defaultdict
+from typing import List, Callable, Dict
 
 from xmarievm.const import MEM_BITSIZE
-from xmarievm.parsing.ast_types import Program
+from xmarievm.parsing.ast_types import Program, Instruction, get_instr_name_by_opcode
 import xmarievm.parsing.ast_types as ast_types
 from xmarievm.runtime.decoder import decode_instruction
 from xmarievm.runtime.streams.input_stream import InputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.util import int_from_2c, int_in_2c_to_hex
+
+OPCODE_TO_COST = {
+    ast_types.JnS.opcode: 5,
+    ast_types.Load.opcode: 3,
+    ast_types.Store.opcode: 3,
+    ast_types.Add.opcode: 3,
+    ast_types.Subt.opcode: 3,
+    ast_types.Input.opcode: 2,
+    ast_types.Output.opcode: 2,
+    ast_types.Halt.opcode: 1,
+    ast_types.Skipcond.opcode: 3,
+    ast_types.Jump.opcode: 1,
+    ast_types.Clear.opcode: 1,
+    ast_types.AddI.opcode: 5,
+    ast_types.ShiftL.opcode: 3,
+    ast_types.ShiftR.opcode: 3,
+    ast_types.SubtI.opcode: 5,
+    ast_types.Incr.opcode: 1,
+    ast_types.Decr.opcode: 1,
+    ast_types.StoreI.opcode: 5,
+    ast_types.JumpI.opcode: 5,
+    ast_types.Push.opcode: 1,
+    ast_types.Pop.opcode: 1,
+    ast_types.LoadI.opcode: 5,
+    ast_types.StoreX.opcode: 1,
+    ast_types.StoreY.opcode: 1,
+    ast_types.LoadX.opcode: 1,
+    ast_types.LoadY.opcode: 1,
+}
 
 
 class MarieVm:
@@ -22,6 +52,9 @@ class MarieVm:
     output_stream: OutputStream
     running: bool
 
+    cost_of_executed_instrs: int
+    instr_to_call_count: Dict[str, int]
+
     def __init__(self, memory: List[int], input_stream: InputStream, output_stream: OutputStream, stack: List[int]):
         self._AC = 0
         self.PC = 0
@@ -29,6 +62,8 @@ class MarieVm:
         self.Y = 0
         self.MAR = 0
         self.MBR = 0
+        self.cost_of_executed_instrs = 0
+        self.instr_to_call_count = defaultdict(lambda: 0)
 
         self.memory = memory
         self.stack = stack
@@ -50,9 +85,13 @@ class MarieVm:
         while self.running:
             instr = self._fetch_instruction()
             decoded_instr = decode_instruction(instr)
-            action = self._get_action(decoded_instr.opcode)
+            opcode = decoded_instr.opcode
+            action = self._get_action(opcode)
             action(decoded_instr.arg)
             self.PC += 1
+            self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
+            instr_name = get_instr_name_by_opcode(opcode)
+            self.instr_to_call_count[instr_name] += 1
 
     def _load_into_memory(self, program: Program) -> None:
         last_addr = 0
@@ -188,35 +227,35 @@ class MarieVm:
         self.Y = self.AC
 
     def _get_action(self, opcode: int) -> Callable:
-        if opcode == 0x0:
+        if opcode == ast_types.JnS.opcode:
             return self._jns
-        if opcode == 0x1:
+        if opcode == ast_types.Load.opcode:
             return self._load
-        if opcode == 0x2:
+        if opcode == ast_types.Store.opcode:
             return self._store
-        if opcode == 0x3:
+        if opcode == ast_types.Add.opcode:
             return self._add
-        if opcode == 0x4:
+        if opcode == ast_types.Subt.opcode:
             return self._subt
-        if opcode == 0x5:
+        if opcode == ast_types.Input.opcode:
             return self._input
-        if opcode == 0x6:
+        if opcode == ast_types.Output.opcode:
             return self._output
-        if opcode == 0x7:
+        if opcode == ast_types.Halt.opcode:
             return self._halt
-        if opcode == 0x8:
+        if opcode == ast_types.Skipcond.opcode:
             return self._skipcond
-        if opcode == 0x9:
+        if opcode == ast_types.Jump.opcode:
             return self._jump
-        if opcode == 0xA:
+        if opcode == ast_types.Clear.opcode:
             return self._clear
-        if opcode == 0xB:
+        if opcode == ast_types.AddI.opcode:
             return self._addi
-        if opcode == 0x11:
+        if opcode == ast_types.ShiftL.opcode:
             return self._shiftl
-        if opcode == 0x12:
+        if opcode == ast_types.ShiftR.opcode:
             return self._shiftr
-        if opcode == 0x13:
+        if opcode == ast_types.SubtI.opcode:
             return self._subti
         if opcode == ast_types.Incr.opcode:
             return self._incr
