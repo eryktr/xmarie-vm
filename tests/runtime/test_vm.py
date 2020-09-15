@@ -6,8 +6,6 @@ from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.runtime.vm import MarieVm
 
 
-
-
 def test_load_label_hex(vm):
     code = '''\
 Load X
@@ -496,3 +494,22 @@ def test_profiling_stats(vm):
         'StoreY': 1,
         'LoadY': 1,
     }
+
+
+def test_debug_generates_the_right_number_of_snapshots(vm):
+    code = '''
+    Load X
+    StoreY
+    Load Y
+    LoadY
+    Halt
+
+    X, DEC 10
+    Y, DEC 20
+    '''
+
+    program = parser.parse(code)
+
+    snapshots = vm.debug(program)
+
+    assert len(snapshots) == 5

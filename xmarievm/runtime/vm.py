@@ -84,18 +84,18 @@ class MarieVm:
         self._load_into_memory(program)
         self.running = True
         while self.running:
-            self._step()
+            self.step()
 
     def debug(self, program: Program) -> List['Snapshot']:
         snapshots = []
         self._load_into_memory(program)
         self.running = True
         while self.running:
-            self._step()
+            self.step()
             snapshots.append(snapshot_maker.make_snapshot(self))
         return snapshots
 
-    def _step(self):
+    def step(self):
         instr = self._fetch_instruction()
         decoded_instr = decode_instruction(instr)
         opcode = decoded_instr.opcode
