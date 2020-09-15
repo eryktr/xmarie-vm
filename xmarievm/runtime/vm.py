@@ -8,6 +8,7 @@ from xmarievm.runtime.decoder import decode_instruction
 from xmarievm.runtime.streams.input_stream import InputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.util import int_from_2c, int_in_2c_to_hex
+from xmarievm.runtime import snapshot_maker
 
 OPCODE_TO_COST = {
     ast_types.JnS.opcode: 5,
@@ -83,15 +84,27 @@ class MarieVm:
         self._load_into_memory(program)
         self.running = True
         while self.running:
-            instr = self._fetch_instruction()
-            decoded_instr = decode_instruction(instr)
-            opcode = decoded_instr.opcode
-            action = self._get_action(opcode)
-            action(decoded_instr.arg)
-            self.PC += 1
-            self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
-            instr_name = get_instr_name_by_opcode(opcode)
-            self.instr_to_call_count[instr_name] += 1
+            self._step()
+
+    def debug(self, program: Program) -> List['Snapshot']:
+        snapshots = []
+        self._load_into_memory(program)
+        self.running = True
+        while self.running:
+            self._step()
+            snapshots.append(snapshot_maker.make_snapshot(self))
+        return snapshots
+
+    def _step(self):
+        instr = self._fetch_instruction()
+        decoded_instr = decode_instruction(instr)
+        opcode = decoded_instr.opcode
+        action = self._get_action(opcode)
+        action(decoded_instr.arg)
+        self.PC += 1
+        self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
+        instr_name = get_instr_name_by_opcode(opcode)
+        self.instr_to_call_count[instr_name] += 1
 
     def _load_into_memory(self, program: Program) -> None:
         last_addr = 0
