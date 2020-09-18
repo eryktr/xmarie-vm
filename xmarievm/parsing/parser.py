@@ -139,6 +139,11 @@ def p_arg(p):
     p[0] = p[1]
 
 
+def p_error(t):
+    line_number = getattr(t.lexer, 'line_number', 1)
+    raise SyntaxError(f'Syntax error in line: {line_number}. Invalid token: {t.value}')
+
+
 _parser = yacc.yacc(write_tables=False, debug=False)
 
 

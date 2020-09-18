@@ -5,10 +5,10 @@ from xmarievm.const import MEM_BITSIZE
 from xmarievm.parsing.ast_types import Program, Instruction, get_instr_name_by_opcode
 import xmarievm.parsing.ast_types as ast_types
 from xmarievm.runtime.decoder import decode_instruction
-from xmarievm.runtime.streams.input_stream import InputStream
+from xmarievm.runtime.streams.input_stream import InputStream, BufferedInputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.util import int_from_2c, int_in_2c_to_hex
-from xmarievm.runtime import snapshot_maker
+from xmarievm.runtime import snapshot_maker, memory
 
 OPCODE_TO_COST = {
     ast_types.JnS.opcode: 5,
@@ -71,6 +71,15 @@ class MarieVm:
         self.input_stream = input_stream
         self.output_stream = output_stream
         self.running = False
+
+    @classmethod
+    def get_default(cls) -> 'MarieVm':
+        return cls(
+            memory=memory.uninitialized(1024),
+            input_stream=BufferedInputStream(''),
+            output_stream=OutputStream(),
+            stack=[]
+        )
 
     @property
     def AC(self):

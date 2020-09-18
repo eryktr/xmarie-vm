@@ -96,6 +96,10 @@ t_ignore = ' \t'
 def t_NEWLINE(t):
     r'\n\s*'
     t.lexer.lineno += 1  # lineno represents memory address
+    if not hasattr(t.lexer, 'line_number'):
+        t.lexer.line_number = 2
+    else:
+        t.lexer.line_number += t.value.count('\n')
     return t
 
 

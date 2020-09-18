@@ -1,8 +1,9 @@
+import setuptools
 from distutils.core import setup
 
 setup(
     name='xmarievm',
-    version='0.0.0',
+    version='1.0.1',
     description='Virtual machine to run XMARIE code',
     author='eryktr',
     install_requires=[
@@ -14,5 +15,6 @@ setup(
             'flake8',
             'mypy',
         ]
-    }
+    },
+    packages=setuptools.find_namespace_packages(include=('xmarievm', 'xmarievm.*')),
 )

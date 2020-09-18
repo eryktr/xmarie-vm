@@ -1,6 +1,7 @@
 import pytest
 
 import xmarievm.parsing.parser as parser
+from xmarievm import api
 from xmarievm.runtime.streams.input_stream import StandardInputStream, BufferedInputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.runtime.vm import MarieVm
@@ -513,3 +514,18 @@ def test_debug_generates_the_right_number_of_snapshots(vm):
     snapshots = vm.debug(program)
 
     assert len(snapshots) == 5
+
+
+def test_run_incorrect_code():
+    code = '''
+    BadIntr Z
+    Load X
+    Add Y
+   
+    
+    X, DEC 10
+    Y, DEC 16
+    '''
+
+    with pytest.raises(SyntaxError):
+        api.run(code, debug=False)
