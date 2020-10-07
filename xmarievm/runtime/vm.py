@@ -47,6 +47,7 @@ class MarieVm:
     PC: int
     MAR: int
     MBR: int
+    IR: int
     stack: List[int]
     memory: List[int]
     input_stream: InputStream
@@ -63,6 +64,7 @@ class MarieVm:
         self.Y = 0
         self.MAR = 0
         self.MBR = 0
+        self.IR = 0
         self.cost_of_executed_instrs = 0
         self.instr_to_call_count = defaultdict(lambda: 0)
 
@@ -106,6 +108,7 @@ class MarieVm:
 
     def step(self):
         instr = self._fetch_instruction()
+        self.IR = instr
         decoded_instr = decode_instruction(instr)
         opcode = decoded_instr.opcode
         action = self._get_action(opcode)

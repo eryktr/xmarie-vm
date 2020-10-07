@@ -12,6 +12,7 @@ class Snapshot:
     PC: int
     MAR: int
     MBR: int
+    IR: int
     stack: List[int]
     memory: List[int]
     output_stream: OutputStream
