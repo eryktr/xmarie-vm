@@ -2,7 +2,7 @@ import pytest
 
 import xmarievm.parsing.parser as parser
 from xmarievm import api
-from xmarievm.runtime.streams.input_stream import StandardInputStream, BufferedInputStream
+from xmarievm.runtime.streams.input_stream import BufferedInputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.runtime.vm import MarieVm
 
@@ -193,7 +193,13 @@ def test_input(input_, acc):
     Input
     Halt
     '''
-    vm = MarieVm(memory=[0] * 1024, input_stream=BufferedInputStream(input_), output_stream=OutputStream(), stack=[])
+    vm = MarieVm(
+        memory=[0] * 1024,
+        input_stream=BufferedInputStream(input_),
+        output_stream=OutputStream(),
+        stack=[],
+        max_num_of_executed_instrs=1000,
+    )
     program = parser.parse(code)
 
     vm.execute(program)
@@ -529,3 +535,24 @@ def test_run_incorrect_code():
 
     with pytest.raises(SyntaxError):
         api.run(code, debug=False)
+
+
+def test_vm_raises_when_max_allowed_num_of_executed_instrs_is_exceeded(vm):
+    vm.max_num_of_executed_instrs = 1000
+    vm.num_of_executed_instrs = 998
+
+    code = '''
+    Load X
+    StoreY
+    Load Y
+    LoadY
+    Halt
+
+    X, DEC 10
+    Y, DEC 20
+    '''
+
+    program = parser.parse(code)
+
+    with pytest.raises(TimeoutError):
+        vm.execute(program)

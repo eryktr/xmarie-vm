@@ -10,6 +10,8 @@ from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.util import int_from_2c, int_in_2c_to_hex
 from xmarievm.runtime import snapshot_maker, memory
 
+MAX_NUM_OF_EXECUTED_INSTRS = 1_000_000
+
 OPCODE_TO_COST = {
     ast_types.JnS.opcode: 5,
     ast_types.Load.opcode: 3,
@@ -57,7 +59,16 @@ class MarieVm:
     cost_of_executed_instrs: int
     instr_to_call_count: Dict[str, int]
 
-    def __init__(self, memory: List[int], input_stream: InputStream, output_stream: OutputStream, stack: List[int]):
+    num_of_executed_instrs: int
+
+    def __init__(
+        self,
+        memory: List[int],
+        input_stream: InputStream,
+        output_stream: OutputStream,
+        stack: List[int],
+        max_num_of_executed_instrs: int,
+    ):
         self._AC = 0
         self.PC = 0
         self.X = 0
@@ -74,13 +85,17 @@ class MarieVm:
         self.output_stream = output_stream
         self.running = False
 
+        self.num_of_executed_instrs = 0
+        self.max_num_of_executed_instrs = max_num_of_executed_instrs
+
     @classmethod
     def get_default(cls) -> 'MarieVm':
         return cls(
             memory=memory.uninitialized(1024),
             input_stream=BufferedInputStream(''),
             output_stream=OutputStream(),
-            stack=[]
+            stack=[],
+            max_num_of_executed_instrs=MAX_NUM_OF_EXECUTED_INSTRS
         )
 
     @property
@@ -107,6 +122,8 @@ class MarieVm:
         return snapshots
 
     def step(self):
+        if self.num_of_executed_instrs > self.max_num_of_executed_instrs:
+            raise TimeoutError(f'Maximum number of executed instructions exceeded')
         instr = self._fetch_instruction()
         self.IR = instr
         decoded_instr = decode_instruction(instr)
@@ -114,6 +131,8 @@ class MarieVm:
         action = self._get_action(opcode)
         action(decoded_instr.arg)
         self.PC += 1
+        print(f"Running line: {self._get_lineno()}")
+        self.num_of_executed_instrs += 1
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
         instr_name = get_instr_name_by_opcode(opcode)
         self.instr_to_call_count[instr_name] += 1
@@ -304,3 +323,6 @@ class MarieVm:
             return self._loadx
         if opcode == ast_types.LoadY.opcode:
             return self._loady
+
+    def _get_lineno(self):
+        return self.PC + 1
