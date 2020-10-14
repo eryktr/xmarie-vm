@@ -517,7 +517,7 @@ def test_debug_generates_the_right_number_of_snapshots(vm):
 
     program = parser.parse(code)
 
-    snapshots = vm.debug(program)
+    snapshots = vm.debug(program, breakpoints=[])
 
     assert len(snapshots) == 5
 

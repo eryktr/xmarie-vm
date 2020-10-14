@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import List, Callable, Dict
 
+from xmarievm.breakpoints import Breakpoint
 from xmarievm.const import MEM_BITSIZE
 from xmarievm.parsing.ast_types import Program, Instruction, get_instr_name_by_opcode
 import xmarievm.parsing.ast_types as ast_types
@@ -60,6 +61,7 @@ class MarieVm:
     instr_to_call_count: Dict[str, int]
 
     num_of_executed_instrs: int
+    breakpoints: List[Breakpoint]
 
     def __init__(
         self,
@@ -88,6 +90,8 @@ class MarieVm:
         self.num_of_executed_instrs = 0
         self.max_num_of_executed_instrs = max_num_of_executed_instrs
 
+        self.breakpoints = []
+
     @classmethod
     def get_default(cls) -> 'MarieVm':
         return cls(
@@ -112,8 +116,9 @@ class MarieVm:
         while self.running:
             self.step()
 
-    def debug(self, program: Program) -> List['Snapshot']:
+    def debug(self, program: Program, breakpoints: List[Breakpoint]) -> List['Snapshot']:
         snapshots = []
+        self.breakpoints = breakpoints
         self._load_into_memory(program)
         self.running = True
         while self.running:
@@ -131,7 +136,8 @@ class MarieVm:
         action = self._get_action(opcode)
         action(decoded_instr.arg)
         self.PC += 1
-        print(f"Running line: {self._get_lineno()}")
+        if self.PC in self.breakpoints:
+            print(f'Breakpoints reached! {self.breakpoints[self.PC]}')
         self.num_of_executed_instrs += 1
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
         instr_name = get_instr_name_by_opcode(opcode)
@@ -325,4 +331,4 @@ class MarieVm:
             return self._loady
 
     def _get_lineno(self):
-        return self.PC + 1
+        return self.PC
