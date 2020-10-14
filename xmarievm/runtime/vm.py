@@ -62,6 +62,7 @@ class MarieVm:
 
     num_of_executed_instrs: int
     breakpoints: List[Breakpoint]
+    pc_to_breakpoint: Dict[int, Breakpoint]
 
     def __init__(
         self,
@@ -91,6 +92,7 @@ class MarieVm:
         self.max_num_of_executed_instrs = max_num_of_executed_instrs
 
         self.breakpoints = []
+        self.pc_to_breakpoint = {}
 
     @classmethod
     def get_default(cls) -> 'MarieVm':
@@ -119,6 +121,10 @@ class MarieVm:
     def debug(self, program: Program, breakpoints: List[Breakpoint]) -> List['Snapshot']:
         snapshots = []
         self.breakpoints = breakpoints
+        self.pc_to_breakpoint = {
+            b.current_lineno: b
+            for b in breakpoints
+        }
         self._load_into_memory(program)
         self.running = True
         while self.running:
@@ -136,8 +142,8 @@ class MarieVm:
         action = self._get_action(opcode)
         action(decoded_instr.arg)
         self.PC += 1
-        if self.PC in self.breakpoints:
-            print(f'Breakpoints reached! {self.breakpoints[self.PC]}')
+        if self.PC in self.pc_to_breakpoint:
+            print(f'Breakpoints reached! {self.pc_to_breakpoint[self.PC]}')
         self.num_of_executed_instrs += 1
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
         instr_name = get_instr_name_by_opcode(opcode)
