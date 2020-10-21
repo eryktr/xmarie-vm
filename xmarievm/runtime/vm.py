@@ -14,7 +14,7 @@ from xmarievm.runtime import snapshot_maker, memory
 MAX_NUM_OF_EXECUTED_INSTRS = 1_000_000
 
 OPCODE_TO_COST = {
-    ast_types.JnS.opcode: 5,
+    ast_types.JnS.opcode: 4,
     ast_types.Load.opcode: 3,
     ast_types.Store.opcode: 3,
     ast_types.Add.opcode: 3,
@@ -72,7 +72,7 @@ class MarieVm:
         stack: List[int],
         max_num_of_executed_instrs: int,
     ):
-        self._AC = 0
+        self.AC = 0
         self.PC = 0
         self.X = 0
         self.Y = 0
