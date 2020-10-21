@@ -1,11 +1,12 @@
 from collections import defaultdict
-from typing import List, Callable, Dict
+from typing import List, Callable, Dict, Optional
 
-from xmarievm.breakpoints import Breakpoint
+from xmarievm.breakpoints import Breakpoint, BreakpointHit
 from xmarievm.const import MEM_BITSIZE
 from xmarievm.parsing.ast_types import Program, Instruction, get_instr_name_by_opcode
 import xmarievm.parsing.ast_types as ast_types
 from xmarievm.runtime.decoder import decode_instruction
+from xmarievm.runtime.snapshot_maker import Snapshot
 from xmarievm.runtime.streams.input_stream import InputStream, BufferedInputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.util import int_from_2c, int_in_2c_to_hex
@@ -64,6 +65,8 @@ class MarieVm:
     breakpoints: List[Breakpoint]
     pc_to_breakpoint: Dict[int, Breakpoint]
 
+    is_in_debug_mode: bool
+
     def __init__(
         self,
         memory: List[int],
@@ -93,6 +96,7 @@ class MarieVm:
 
         self.breakpoints = []
         self.pc_to_breakpoint = {}
+        self.is_in_debug_mode = False
 
     @classmethod
     def get_default(cls) -> 'MarieVm':
@@ -118,21 +122,26 @@ class MarieVm:
         while self.running:
             self.step()
 
-    def debug(self, program: Program, breakpoints: List[Breakpoint]) -> List['Snapshot']:
-        snapshots = []
+    def setup_debug(self, program: Program, breakpoints: List[Breakpoint]):
         self.breakpoints = breakpoints
         self.pc_to_breakpoint = {
-            b.current_lineno: b
+            b.current_lineno - 1: b
             for b in breakpoints
         }
-        self._load_into_memory(program)
         self.running = True
-        while self.running:
-            self.step()
-            snapshots.append(snapshot_maker.make_snapshot(self))
-        return snapshots
+        self.is_in_debug_mode = True
+        self._load_into_memory(program)
 
-    def step(self):
+    def hit_breakpoint(self) -> Optional[BreakpointHit]:
+        while self.running:
+            if self.PC in self.pc_to_breakpoint:
+                hit = BreakpointHit(self.pc_to_breakpoint[self.PC], snapshot_maker.make_snapshot(self))
+                self.step()
+                return hit
+            self.step()
+        self.is_in_debug_mode = False
+
+    def step(self) -> Snapshot:
         if self.num_of_executed_instrs > self.max_num_of_executed_instrs:
             raise TimeoutError(f'Maximum number of executed instructions exceeded')
         instr = self._fetch_instruction()
@@ -148,6 +157,10 @@ class MarieVm:
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
         instr_name = get_instr_name_by_opcode(opcode)
         self.instr_to_call_count[instr_name] += 1
+        return snapshot_maker.make_snapshot(self)
+
+    def setup_with(self, program: Program):
+        self._load_into_memory(program)
 
     def _load_into_memory(self, program: Program) -> None:
         last_addr = 0

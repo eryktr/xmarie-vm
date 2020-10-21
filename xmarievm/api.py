@@ -1,4 +1,5 @@
-from typing import List
+from builtins import str
+from typing import List, Dict
 
 from xmarievm.breakpoints import parse_breakpoints
 from xmarievm.parsing import parser
@@ -18,6 +19,6 @@ def run(code: str, debug: bool, input_=None, breakpoints=None) -> List[Snapshot]
         vm.input_stream = istream
     program = parser.parse(code)
     if debug:
-        return vm.debug(program, parsed_breakpoints)
+        return vm.setup_debug(program, parsed_breakpoints)
     vm.execute(program)
     return [snapshot_maker.make_snapshot(vm)]

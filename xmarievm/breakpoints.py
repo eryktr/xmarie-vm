@@ -2,12 +2,20 @@ import re
 from dataclasses import dataclass
 from typing import List
 
+from xmarievm.runtime.snapshot_maker import Snapshot
+
 
 @dataclass
 class Breakpoint:
     current_lineno: int
     original_lineno: int
     instr: str
+
+
+@dataclass
+class BreakpointHit:
+    breakpoint: Breakpoint
+    snapshot: Snapshot
 
 
 def parse_breakpoints(breakpoints: List[int], code: str):

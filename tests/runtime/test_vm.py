@@ -1,7 +1,9 @@
 import pytest
+from setuptools.package_index import parse_requirement_arg
 
 import xmarievm.parsing.parser as parser
 from xmarievm import api
+from xmarievm.breakpoints import Breakpoint, BreakpointHit
 from xmarievm.runtime.streams.input_stream import BufferedInputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.runtime.vm import MarieVm
@@ -503,25 +505,6 @@ def test_profiling_stats(vm):
     }
 
 
-def test_debug_generates_the_right_number_of_snapshots(vm):
-    code = '''
-    Load X
-    StoreY
-    Load Y
-    LoadY
-    Halt
-
-    X, DEC 10
-    Y, DEC 20
-    '''
-
-    program = parser.parse(code)
-
-    snapshots = vm.debug(program, breakpoints=[])
-
-    assert len(snapshots) == 5
-
-
 def test_run_incorrect_code():
     code = '''
     BadIntr Z
@@ -556,3 +539,48 @@ def test_vm_raises_when_max_allowed_num_of_executed_instrs_is_exceeded(vm):
 
     with pytest.raises(TimeoutError):
         vm.execute(program)
+
+
+def test_step(vm):
+    code = '''
+    Load X
+    
+    X, DEC 3
+    '''
+    program = parser.parse(code)
+
+    vm.setup_with(program)
+    ss = vm.step()
+
+    assert vm.AC == 3
+    assert ss.AC == 3
+
+
+def test_hit_breakpoint(vm):
+    code = '''
+    Load X
+    Add Y
+    Add Z
+    Halt
+    X, DEC 1
+    Y, DEC 2
+    Z, DEC 3
+    '''
+    program = parser.parse(code)
+    bp1 = Breakpoint(current_lineno=1, original_lineno=1, instr='Load X')
+    bp2 = Breakpoint(current_lineno=4, original_lineno=5, instr='Add Z')
+    breakpoints = [bp1, bp2]
+
+    vm.setup_debug(program, breakpoints)
+
+    hit1 = vm.hit_breakpoint()
+    hit2 = vm.hit_breakpoint()
+    hit3 = vm.hit_breakpoint()
+
+    assert hit1.breakpoint == bp1
+    assert hit1.snapshot.AC == 0
+
+    assert hit2.breakpoint == bp2
+    assert hit2.snapshot.AC == 6
+
+    assert hit3 is None
