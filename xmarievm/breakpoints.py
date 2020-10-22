@@ -22,7 +22,7 @@ def parse_breakpoints(breakpoints: List[int], code: str):
     new_breakpoints = []
     code_lines = code.split('\n')
     code_with_breakpoint_markers = []
-    for lineno, line in enumerate(code_lines):
+    for lineno, line in enumerate(code_lines, start=1):
         if lineno in breakpoints:
             code_with_breakpoint_markers.append(f'{lineno}*{line}')
         else:
