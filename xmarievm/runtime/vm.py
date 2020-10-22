@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import List, Callable, Dict, Optional
 
-from xmarievm.breakpoints import Breakpoint, BreakpointHit
+from xmarievm.breakpoints import Breakpoint, BreakpointHit, parse_breakpoints
 from xmarievm.const import MEM_BITSIZE
 from xmarievm.parsing.ast_types import Program, Instruction, get_instr_name_by_opcode
 import xmarievm.parsing.ast_types as ast_types
@@ -123,7 +123,7 @@ class MarieVm:
             self.step()
 
     def setup_debug(self, program: Program, breakpoints: List[Breakpoint]):
-        self.breakpoints = breakpoints
+        self.breakpoints = parse_breakpoints(breakpoints)
         self.pc_to_breakpoint = {
             b.current_lineno - 1: b
             for b in breakpoints

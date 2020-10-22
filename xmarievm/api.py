@@ -1,7 +1,8 @@
 from builtins import str
 from typing import List
 
-from xmarievm.breakpoints import parse_breakpoints
+import xmarievm.breakpoints as breakpoints_module
+import xmarievm.preprocessing as preprocessing
 from xmarievm.parsing import parser
 from xmarievm.parsing.ast_types import Program
 from xmarievm.runtime import snapshot_maker
@@ -14,7 +15,7 @@ def run(code: str, debug: bool, input_=None, breakpoints=None) -> List[Snapshot]
     vm = MarieVm.get_default()
     parsed_breakpoints = []
     if breakpoints:
-        parsed_breakpoints = parse_breakpoints(breakpoints, code)
+        parsed_breakpoints = breakpoints_module.parse_breakpoints(breakpoints, code)
     if input_:
         istream = BufferedInputStream(input_)
         vm.input_stream = istream
@@ -25,5 +26,13 @@ def run(code: str, debug: bool, input_=None, breakpoints=None) -> List[Snapshot]
     return [snapshot_maker.make_snapshot(vm)]
 
 
-def parse(code: str) -> Program:
+def parse_code(code: str) -> Program:
     return parser.parse(code)
+
+
+def parse_breakpoints(code: str, breakpoints: List[int]) -> List[breakpoints_module.Breakpoint]:
+    return breakpoints_module.parse_breakpoints(breakpoints, code)
+
+
+def get_line_array(code: str) -> List[int]:
+    return preprocessing.get_line_array(code)
