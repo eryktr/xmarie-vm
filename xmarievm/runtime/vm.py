@@ -123,7 +123,6 @@ class MarieVm:
             self.step()
 
     def setup_debug(self, program: Program, breakpoints: List[Breakpoint]):
-        self.breakpoints = parse_breakpoints(breakpoints)
         self.pc_to_breakpoint = {
             b.current_lineno - 1: b
             for b in breakpoints
