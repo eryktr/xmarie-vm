@@ -122,7 +122,7 @@ class MarieVm:
         while self.running:
             self.step()
 
-    def setup_debug(self, program: Program, breakpoints: List[Breakpoint]):
+    def setup_debug(self, program: Program, breakpoints: List[Breakpoint], line_array: List[int]):
         self.pc_to_breakpoint = {
             b.current_lineno - 1: b
             for b in breakpoints

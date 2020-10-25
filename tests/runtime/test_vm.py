@@ -571,7 +571,7 @@ def test_hit_breakpoint(vm):
     bp2 = Breakpoint(current_lineno=4, original_lineno=5, instr='Add Z')
     breakpoints = [bp1, bp2]
 
-    vm.setup_debug(program, breakpoints)
+    vm.setup_debug(program, breakpoints, [])
 
     hit1 = vm.hit_breakpoint()
     hit2 = vm.hit_breakpoint()
