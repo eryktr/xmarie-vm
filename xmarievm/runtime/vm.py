@@ -66,6 +66,7 @@ class MarieVm:
     pc_to_breakpoint: Dict[int, Breakpoint]
 
     is_in_debug_mode: bool
+    line_array: List[int]
 
     def __init__(
         self,
@@ -97,6 +98,7 @@ class MarieVm:
         self.breakpoints = []
         self.pc_to_breakpoint = {}
         self.is_in_debug_mode = False
+        self.line_array = []
 
     @classmethod
     def get_default(cls) -> 'MarieVm':
@@ -130,6 +132,7 @@ class MarieVm:
         self.running = True
         self.is_in_debug_mode = True
         self._load_into_memory(program)
+        self.line_array = line_array
 
     def hit_breakpoint(self) -> Optional[BreakpointHit]:
         while self.running:
