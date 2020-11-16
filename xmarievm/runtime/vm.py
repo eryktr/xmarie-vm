@@ -137,9 +137,7 @@ class MarieVm:
     def hit_breakpoint(self) -> Optional[BreakpointHit]:
         while self.running:
             if self.PC in self.pc_to_breakpoint:
-                hit = BreakpointHit(self.pc_to_breakpoint[self.PC], snapshot_maker.make_snapshot(self))
-                self.step()
-                return hit
+                return BreakpointHit(self.pc_to_breakpoint[self.PC], snapshot_maker.make_snapshot(self))
             self.step()
         self.is_in_debug_mode = False
 
@@ -357,4 +355,4 @@ class MarieVm:
             return self._loady
 
     def _get_lineno(self):
-        return self.PC
+        return self.PC - 1
