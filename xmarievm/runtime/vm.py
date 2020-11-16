@@ -355,4 +355,4 @@ class MarieVm:
             return self._loady
 
     def _get_lineno(self):
-        return self.PC - 1
+        return self.PC
