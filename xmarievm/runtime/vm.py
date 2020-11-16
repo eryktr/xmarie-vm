@@ -143,7 +143,13 @@ class MarieVm:
             self.step()
         self.is_in_debug_mode = False
 
-    def step(self) -> StepHit:
+    def debugstep(self) -> StepHit:
+        self.step()
+        snapshot = snapshot_maker.make_snapshot(self)
+        curr_lineno = self._get_lineno()
+        return StepHit(current_lineno=curr_lineno, original_lineno=self.line_array[curr_lineno], snapshot=snapshot)
+
+    def step(self) -> None:
         if self.num_of_executed_instrs > self.max_num_of_executed_instrs:
             raise TimeoutError(f'Maximum number of executed instructions exceeded')
         instr = self._fetch_instruction()
@@ -159,9 +165,6 @@ class MarieVm:
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
         instr_name = get_instr_name_by_opcode(opcode)
         self.instr_to_call_count[instr_name] += 1
-        snapshot = snapshot_maker.make_snapshot(self)
-        curr_lineno = self._get_lineno()
-        return StepHit(current_lineno=curr_lineno, original_lineno=self.line_array[curr_lineno], snapshot=snapshot)
 
     def setup_with(self, program: Program):
         self._load_into_memory(program)
