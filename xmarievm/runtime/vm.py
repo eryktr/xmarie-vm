@@ -1,16 +1,16 @@
 from collections import defaultdict
 from typing import List, Callable, Dict, Optional
 
-from xmarievm.breakpoints import Breakpoint, BreakpointHit, parse_breakpoints
-from xmarievm.const import MEM_BITSIZE
-from xmarievm.parsing.ast_types import Program, Instruction, get_instr_name_by_opcode
 import xmarievm.parsing.ast_types as ast_types
+from xmarievm.breakpoints import Breakpoint, BreakpointHit, StepHit
+from xmarievm.const import MEM_BITSIZE
+from xmarievm.parsing.ast_types import Program, get_instr_name_by_opcode
+from xmarievm.runtime import snapshot_maker, memory
 from xmarievm.runtime.decoder import decode_instruction
 from xmarievm.runtime.snapshot_maker import Snapshot
 from xmarievm.runtime.streams.input_stream import InputStream, BufferedInputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.util import int_from_2c, int_in_2c_to_hex
-from xmarievm.runtime import snapshot_maker, memory
 
 MAX_NUM_OF_EXECUTED_INSTRS = 1_000_000
 
@@ -143,7 +143,7 @@ class MarieVm:
             self.step()
         self.is_in_debug_mode = False
 
-    def step(self) -> Snapshot:
+    def step(self) -> StepHit:
         if self.num_of_executed_instrs > self.max_num_of_executed_instrs:
             raise TimeoutError(f'Maximum number of executed instructions exceeded')
         instr = self._fetch_instruction()
@@ -159,7 +159,9 @@ class MarieVm:
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
         instr_name = get_instr_name_by_opcode(opcode)
         self.instr_to_call_count[instr_name] += 1
-        return snapshot_maker.make_snapshot(self)
+        snapshot = snapshot_maker.make_snapshot(self)
+        curr_lineno = self._get_lineno()
+        return StepHit(current_lineno=curr_lineno, original_lineno=self.line_array[curr_lineno], snapshot=snapshot)
 
     def setup_with(self, program: Program):
         self._load_into_memory(program)

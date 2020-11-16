@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List
-
+from copy import deepcopy
 from xmarievm.runtime.streams.output_stream import OutputStream
 
 
@@ -20,5 +20,5 @@ class Snapshot:
 
 
 def make_snapshot(vm: 'MarieVm') -> Snapshot:
-    snapshot_data = {attr: getattr(vm, attr) for attr in Snapshot.__annotations__}
+    snapshot_data = {attr: deepcopy(getattr(vm, attr)) for attr in Snapshot.__annotations__}
     return Snapshot(**snapshot_data)

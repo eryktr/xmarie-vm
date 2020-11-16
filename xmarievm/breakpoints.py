@@ -18,6 +18,13 @@ class BreakpointHit:
     snapshot: Snapshot
 
 
+@dataclass
+class StepHit:
+    current_lineno: int
+    original_lineno: int
+    snapshot: Snapshot
+
+
 def parse_breakpoints(breakpoints: List[int], code: str):
     new_breakpoints = []
     code_lines = code.split('\n')
