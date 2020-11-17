@@ -160,15 +160,15 @@ class MarieVm:
         decoded_instr = decode_instruction(instr)
         opcode = decoded_instr.opcode
         action = self._get_action(opcode)
+        instr_name = get_instr_name_by_opcode(opcode)
+        self.instr_to_call_count[instr_name] += 1
+        self.lineno_to_num_calls[self.line_array[self.PC]] += 1  # Previous instr got executed
         action(decoded_instr.arg)
         self.PC += 1
         if self.PC in self.pc_to_breakpoint:
             print(f'Breakpoints reached! {self.pc_to_breakpoint[self.PC]}')
         self.num_of_executed_instrs += 1
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
-        instr_name = get_instr_name_by_opcode(opcode)
-        self.instr_to_call_count[instr_name] += 1
-        self.lineno_to_num_calls[self.line_array[self.PC - 1]] += 1  # Previous instr got executed
 
     def setup_with(self, program: Program):
         self._load_into_memory(program)
