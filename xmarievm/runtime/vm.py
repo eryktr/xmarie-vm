@@ -168,7 +168,7 @@ class MarieVm:
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
         instr_name = get_instr_name_by_opcode(opcode)
         self.instr_to_call_count[instr_name] += 1
-        self.lineno_to_num_calls[self._get_lineno()] += 1
+        self.lineno_to_num_calls[self.line_array[self._get_lineno()]] += 1
 
     def setup_with(self, program: Program):
         self._load_into_memory(program)
