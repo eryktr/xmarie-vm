@@ -68,6 +68,8 @@ class MarieVm:
     is_in_debug_mode: bool
     line_array: List[int]
 
+    lineno_to_num_calls: Dict[int, int]
+
     def __init__(
         self,
         memory: List[int],
@@ -100,6 +102,8 @@ class MarieVm:
         self.is_in_debug_mode = False
         self.line_array = []
 
+        self.lineno_to_num_calls = defaultdict(lambda: 0)
+
     @classmethod
     def get_default(cls) -> 'MarieVm':
         return cls(
@@ -118,7 +122,8 @@ class MarieVm:
     def AC(self, val):
         self._AC = int_from_2c(val, MEM_BITSIZE)
 
-    def execute(self, program: Program) -> None:
+    def execute(self, program: Program, line_array: List[int]) -> None:
+        self.line_array = line_array
         self._load_into_memory(program)
         self.running = True
         while self.running:
@@ -163,6 +168,7 @@ class MarieVm:
         self.cost_of_executed_instrs += OPCODE_TO_COST[opcode]
         instr_name = get_instr_name_by_opcode(opcode)
         self.instr_to_call_count[instr_name] += 1
+        self.lineno_to_num_calls[self._get_lineno()] += 1
 
     def setup_with(self, program: Program):
         self._load_into_memory(program)

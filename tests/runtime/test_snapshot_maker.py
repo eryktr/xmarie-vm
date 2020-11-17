@@ -14,7 +14,7 @@ def test_make_snapshot(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     snapshot = snapshot_maker.make_snapshot(vm)
 

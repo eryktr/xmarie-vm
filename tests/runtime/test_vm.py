@@ -17,7 +17,7 @@ X, HEX 0xFFFFF
 '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == -1
 
@@ -30,7 +30,7 @@ X, DEC 20
 '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 20
 
@@ -45,7 +45,7 @@ Y, HEX 0x00003
 '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 2
 
@@ -60,7 +60,7 @@ Y, HEX 0xFFFFF
 '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 2
 
@@ -76,7 +76,7 @@ Z, HEX 0x20
 '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 0x21
 
@@ -92,7 +92,7 @@ Z, HEX 0x5
 '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 0x2
 
@@ -110,7 +110,7 @@ Z, HEX 0x00004
 '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 3
 
@@ -128,7 +128,7 @@ Z, HEX 0x00001
 '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 1
 
@@ -146,7 +146,7 @@ def test_skipcond_800(vm):
     '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 2
 
@@ -161,7 +161,7 @@ def test_overflow(vm):
     '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == -3
 
@@ -179,7 +179,7 @@ def test_jump(vm):
     '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 10
 
@@ -204,7 +204,7 @@ def test_input(input_, acc):
     )
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == acc
 
@@ -223,7 +223,7 @@ def test_output(vm, output, buf):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.output_stream.buf == buf
 
@@ -240,7 +240,7 @@ def test_shiftl(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 16
 
@@ -258,7 +258,7 @@ def test_shiftr(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 4
 
@@ -273,7 +273,7 @@ def test_clear(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 0
 
@@ -289,7 +289,7 @@ def test_incr(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 2
 
@@ -305,7 +305,7 @@ def test_decr(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 9
 
@@ -323,7 +323,7 @@ def test_storei(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 4
 
@@ -344,7 +344,7 @@ def test_jumpi(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 5
 
@@ -369,7 +369,7 @@ def test_push_and_pop(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.stack == [-2, -1]
 
@@ -384,7 +384,7 @@ def test_loadi(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 99
 
@@ -399,7 +399,7 @@ def test_storex(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.X == 10
 
@@ -413,7 +413,7 @@ def test_storey(vm):
     '''
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.Y == 10
 
@@ -432,7 +432,7 @@ def test_loadx(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 10
 
@@ -451,7 +451,7 @@ def test_loady(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.AC == 10
 
@@ -474,7 +474,7 @@ PrintX, HEX 0x00000
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.output_stream.buf == ['0x2A', '0x2A']
     assert vm.X == 42
@@ -494,7 +494,7 @@ def test_profiling_stats(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program)
+    vm.execute(program, [])
 
     assert vm.cost_of_executed_instrs == 9
     assert vm.instr_to_call_count == {
@@ -538,7 +538,7 @@ def test_vm_raises_when_max_allowed_num_of_executed_instrs_is_exceeded(vm):
     program = parser.parse(code)
 
     with pytest.raises(TimeoutError):
-        vm.execute(program)
+        vm.execute(program, [])
 
 
 def test_step(vm):
@@ -549,8 +549,8 @@ def test_step(vm):
     '''
     program = parser.parse(code)
 
-    vm.setup_with(program)
-    ss = vm.step()
+    vm.setup_debug(program, [], [1, 2, 3])
+    ss = vm.debugstep().snapshot
 
     assert vm.AC == 3
     assert ss.AC == 3
@@ -571,11 +571,14 @@ def test_hit_breakpoint(vm):
     bp2 = Breakpoint(current_lineno=4, original_lineno=5, instr='Add Z')
     breakpoints = [bp1, bp2]
 
-    vm.setup_debug(program, breakpoints, [])
+    vm.setup_debug(program, breakpoints, [1, 2, 3, 4, 5, 6, 7])
 
     hit1 = vm.hit_breakpoint()
+    vm.step()
     hit2 = vm.hit_breakpoint()
+    vm.step()
     hit3 = vm.hit_breakpoint()
+    vm.step()
 
     assert hit1.breakpoint == bp1
     assert hit1.snapshot.AC == 0

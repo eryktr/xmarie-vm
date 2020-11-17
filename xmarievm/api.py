@@ -21,8 +21,8 @@ def run(code: str, debug: bool, input_=None, breakpoints=None) -> List[Snapshot]
         vm.input_stream = istream
     program = parser.parse(code)
     if debug:
-        return vm.setup_debug(program, parsed_breakpoints)
-    vm.execute(program)
+        return vm.setup_debug(program, parsed_breakpoints, [])
+    vm.execute(program, [])
     return [snapshot_maker.make_snapshot(vm)]
 
 
