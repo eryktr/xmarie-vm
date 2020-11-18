@@ -2,7 +2,7 @@ import xmarievm.parsing.parser as parser
 from xmarievm.runtime import snapshot_maker
 
 
-def test_make_snapshot(vm):
+def test_make_snapshot(vm, dummy_linearray):
     code = """
     Load X
     Push
@@ -14,7 +14,7 @@ def test_make_snapshot(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     snapshot = snapshot_maker.make_snapshot(vm)
 

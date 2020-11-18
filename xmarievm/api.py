@@ -20,9 +20,10 @@ def run(code: str, debug: bool, input_=None, breakpoints=None) -> List[Snapshot]
         istream = BufferedInputStream(input_)
         vm.input_stream = istream
     program = parser.parse(code)
+    line_array = [*range(100)]
     if debug:
-        return vm.setup_debug(program, parsed_breakpoints, [])
-    vm.execute(program, [])
+        return vm.setup_debug(program, parsed_breakpoints, line_array)
+    vm.execute(program, line_array)
     return [snapshot_maker.make_snapshot(vm)]
 
 

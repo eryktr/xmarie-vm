@@ -7,7 +7,6 @@ from xmarievm.const import MEM_BITSIZE
 from xmarievm.parsing.ast_types import Program, get_instr_name_by_opcode
 from xmarievm.runtime import snapshot_maker, memory
 from xmarievm.runtime.decoder import decode_instruction
-from xmarievm.runtime.snapshot_maker import Snapshot
 from xmarievm.runtime.streams.input_stream import InputStream, BufferedInputStream
 from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.util import int_from_2c, int_in_2c_to_hex

@@ -9,7 +9,7 @@ from xmarievm.runtime.streams.output_stream import OutputStream
 from xmarievm.runtime.vm import MarieVm
 
 
-def test_load_label_hex(vm):
+def test_load_label_hex(vm, dummy_linearray):
     code = '''\
 Load X
 Halt
@@ -17,12 +17,12 @@ X, HEX 0xFFFFF
 '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == -1
 
 
-def test_load_label_dec(vm):
+def test_load_label_dec(vm, dummy_linearray):
     code = '''\
 Load X
 Halt
@@ -30,12 +30,12 @@ X, DEC 20
 '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 20
 
 
-def test_add_label_hex(vm):
+def test_add_label_hex(vm, dummy_linearray):
     code = '''\
 Load X
 Add Y
@@ -45,12 +45,12 @@ Y, HEX 0x00003
 '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 2
 
 
-def test_subt_label_hex(vm):
+def test_subt_label_hex(vm, dummy_linearray):
     code = '''\
 Load X
 Subt Y
@@ -60,12 +60,12 @@ Y, HEX 0xFFFFF
 '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 2
 
 
-def test_addi_label_hex(vm):
+def test_addi_label_hex(vm, dummy_linearray):
     code = '''\
 Load X
 AddI 4
@@ -76,12 +76,12 @@ Z, HEX 0x20
 '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 0x21
 
 
-def test_subti_label_hex(vm):
+def test_subti_label_hex(vm, dummy_linearray):
     code = '''\
 Load X
 SubtI 4
@@ -92,12 +92,12 @@ Z, HEX 0x5
 '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 0x2
 
 
-def test_skipcond_000(vm):
+def test_skipcond_000(vm, dummy_linearray):
     code = '''\
 Load X
 Skipcond 000
@@ -110,12 +110,12 @@ Z, HEX 0x00004
 '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 3
 
 
-def test_skipcond_400(vm):
+def test_skipcond_400(vm, dummy_linearray):
     code = '''\
 Load X
 Skipcond 400
@@ -128,12 +128,12 @@ Z, HEX 0x00001
 '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 1
 
 
-def test_skipcond_800(vm):
+def test_skipcond_800(vm, dummy_linearray):
     code = '''\
     Load X
     Skipcond 800
@@ -146,12 +146,12 @@ def test_skipcond_800(vm):
     '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 2
 
 
-def test_overflow(vm):
+def test_overflow(vm, dummy_linearray):
     code = '''\
     Load X
     Add Y
@@ -161,12 +161,12 @@ def test_overflow(vm):
     '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == -3
 
 
-def test_jump(vm):
+def test_jump(vm, dummy_linearray):
     code = '''\
             Load X
             Jump here
@@ -179,7 +179,7 @@ def test_jump(vm):
     '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 10
 
@@ -190,7 +190,7 @@ def test_jump(vm):
     ('0xFFFFE', -2),
     ('0x000FF', 255),
 ))
-def test_input(input_, acc):
+def test_input(input_, acc, dummy_linearray):
     code = '''\
     Input
     Halt
@@ -204,7 +204,7 @@ def test_input(input_, acc):
     )
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == acc
 
@@ -213,7 +213,7 @@ def test_input(input_, acc):
     ('0x10', ['0x10']),
     ('0xFFFFF', ['0xFFFFF']),
 ))
-def test_output(vm, output, buf):
+def test_output(vm, output, buf, dummy_linearray):
     code = f'''
     Load X
     Output
@@ -223,12 +223,12 @@ def test_output(vm, output, buf):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.output_stream.buf == buf
 
 
-def test_shiftl(vm):
+def test_shiftl(vm, dummy_linearray):
     code = '''
     Load X
     ShiftL Y
@@ -240,12 +240,12 @@ def test_shiftl(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 16
 
 
-def test_shiftr(vm):
+def test_shiftr(vm, dummy_linearray):
     code = '''
     Load X
     ShiftR Y
@@ -258,12 +258,12 @@ def test_shiftr(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 4
 
 
-def test_clear(vm):
+def test_clear(vm, dummy_linearray):
     code = '''\
     Load X
     Clear
@@ -273,12 +273,12 @@ def test_clear(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 0
 
 
-def test_incr(vm):
+def test_incr(vm, dummy_linearray):
     code = '''
     Load X
     Incr
@@ -289,12 +289,12 @@ def test_incr(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 2
 
 
-def test_decr(vm):
+def test_decr(vm, dummy_linearray):
     code = '''
     Load X
     Decr
@@ -305,12 +305,12 @@ def test_decr(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 9
 
 
-def test_storei(vm):
+def test_storei(vm, dummy_linearray):
     code = '''
     Load Y
     StoreI X
@@ -323,12 +323,12 @@ def test_storei(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 4
 
 
-def test_jumpi(vm):
+def test_jumpi(vm, dummy_linearray):
     code = '''
     Load X
     JumpI Z
@@ -344,12 +344,12 @@ def test_jumpi(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 5
 
 
-def test_push_and_pop(vm):
+def test_push_and_pop(vm, dummy_linearray):
     code = '''
     Load X
     Push
@@ -369,12 +369,12 @@ def test_push_and_pop(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.stack == [-2, -1]
 
 
-def test_loadi(vm):
+def test_loadi(vm, dummy_linearray):
     code = '''
     LoadI X
     Halt
@@ -384,12 +384,12 @@ def test_loadi(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 99
 
 
-def test_storex(vm):
+def test_storex(vm, dummy_linearray):
     code = '''
     Load X
     StoreX
@@ -399,12 +399,12 @@ def test_storex(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.X == 10
 
 
-def test_storey(vm):
+def test_storey(vm, dummy_linearray):
     code = '''
     Load X
     StoreY
@@ -413,12 +413,12 @@ def test_storey(vm):
     '''
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.Y == 10
 
 
-def test_loadx(vm):
+def test_loadx(vm, dummy_linearray):
     code = '''
     Load X
     StoreX
@@ -432,12 +432,12 @@ def test_loadx(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 10
 
 
-def test_loady(vm):
+def test_loady(vm, dummy_linearray):
     code = '''
     Load X
     StoreY
@@ -451,12 +451,12 @@ def test_loady(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.AC == 10
 
 
-def test_jns(vm):
+def test_jns(vm, dummy_linearray):
     code = '''
 JnS PrintX
 JnS PrintX
@@ -474,13 +474,13 @@ PrintX, HEX 0x00000
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.output_stream.buf == ['0x2A', '0x2A']
     assert vm.X == 42
 
 
-def test_profiling_stats(vm):
+def test_profiling_stats(vm, dummy_linearray):
     code = '''
     Load X
     StoreY
@@ -494,7 +494,7 @@ def test_profiling_stats(vm):
 
     program = parser.parse(code)
 
-    vm.execute(program, [])
+    vm.execute(program, dummy_linearray)
 
     assert vm.cost_of_executed_instrs == 9
     assert vm.instr_to_call_count == {
@@ -520,7 +520,7 @@ def test_run_incorrect_code():
         api.run(code, debug=False)
 
 
-def test_vm_raises_when_max_allowed_num_of_executed_instrs_is_exceeded(vm):
+def test_vm_raises_when_max_allowed_num_of_executed_instrs_is_exceeded(vm, dummy_linearray):
     vm.max_num_of_executed_instrs = 1000
     vm.num_of_executed_instrs = 998
 
@@ -538,10 +538,10 @@ def test_vm_raises_when_max_allowed_num_of_executed_instrs_is_exceeded(vm):
     program = parser.parse(code)
 
     with pytest.raises(TimeoutError):
-        vm.execute(program, [])
+        vm.execute(program, dummy_linearray)
 
 
-def test_step(vm):
+def test_step(vm, dummy_linearray):
     code = '''
     Load X
     
@@ -549,14 +549,14 @@ def test_step(vm):
     '''
     program = parser.parse(code)
 
-    vm.setup_debug(program, [], [1, 2, 3])
+    vm.setup_debug(program, [], dummy_linearray)
     ss = vm.debugstep().snapshot
 
     assert vm.AC == 3
     assert ss.AC == 3
 
 
-def test_hit_breakpoint(vm):
+def test_hit_breakpoint(vm, dummy_linearray):
     code = '''
     Load X
     Add Y

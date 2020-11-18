@@ -7,5 +7,11 @@ from xmarievm.runtime.vm import MarieVm, MAX_NUM_OF_EXECUTED_INSTRS
 
 @pytest.fixture
 def vm():
-    return MarieVm(memory=[0] * 1024, input_stream=StandardInputStream(), output_stream=OutputStream(), stack=[],
-                   max_num_of_executed_instrs=MAX_NUM_OF_EXECUTED_INSTRS)
+    vm = MarieVm(memory=[0] * 1024, input_stream=StandardInputStream(), output_stream=OutputStream(), stack=[],
+                 max_num_of_executed_instrs=MAX_NUM_OF_EXECUTED_INSTRS)
+    return vm
+
+
+@pytest.fixture
+def dummy_linearray():
+    return [*range(100)]

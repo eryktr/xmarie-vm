@@ -18,9 +18,10 @@ class Snapshot:
     output_stream: OutputStream
     running: bool
     lineno_to_num_calls: Dict[int, int]
+    instr_to_call_count: Dict[str, int]
+    cost_of_executed_instrs: int
 
 
 def make_snapshot(vm: 'MarieVm') -> Snapshot:
     snapshot_data = {attr: deepcopy(getattr(vm, attr)) for attr in Snapshot.__annotations__}
-    snapshot_data['lineno_to_num_calls'] = vm.lineno_to_num_calls
     return Snapshot(**snapshot_data)
