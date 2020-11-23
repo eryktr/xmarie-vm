@@ -146,6 +146,8 @@ class MarieVm:
         self.is_in_debug_mode = False
 
     def debugstep(self) -> StepHit:
+        if not self.running:
+            raise RuntimeError('Program has terminated')
         self.step()
         snapshot = snapshot_maker.make_snapshot(self)
         curr_lineno = self._get_lineno()
