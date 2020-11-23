@@ -56,6 +56,7 @@ class MarieVm:
     input_stream: InputStream
     output_stream: OutputStream
     running: bool
+    label_to_mem_addr: Dict[str, int]
 
     cost_of_executed_instrs: int
     instr_to_call_count: Dict[str, int]
@@ -86,6 +87,7 @@ class MarieVm:
         self.IR = 0
         self.cost_of_executed_instrs = 0
         self.instr_to_call_count = defaultdict(lambda: 0)
+        self.label_to_mem_addr = {}
 
         self.memory = memory
         self.stack = stack
@@ -176,6 +178,7 @@ class MarieVm:
 
     def _load_into_memory(self, program: Program) -> None:
         last_addr = 0
+        self.label_to_mem_addr = program.labels
         for i in program.instructions:
             self.memory[last_addr] = i
             last_addr += 1
