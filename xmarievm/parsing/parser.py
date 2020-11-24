@@ -73,6 +73,13 @@ def p_single_instruction(p):
 
 def p_complex_instruction(p):
     'complex_instruction : command arg NEWLINE'
+    if p[1] == 'Skipcond':
+        if p[2] not in ('000', '400', '800'):
+            raise ParsingError(
+                f'''Invalid Skipcond usage in line: {p.lexer.line_number}. Allowed 
+                operands are (000, 400, 800).
+                '''
+            )
     p[0] = _get_ast_obj(p[1])(p[2])
 
 
