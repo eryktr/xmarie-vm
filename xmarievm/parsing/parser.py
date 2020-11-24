@@ -76,7 +76,7 @@ def p_complex_instruction(p):
     if p[1] == 'Skipcond':
         if p[2] not in (0, 400, 800):
             raise ParsingError(
-                f'''Invalid Skipcond usage in line: {p.lexer.line_number}. 
+                f'''Invalid Skipcond usage in line: {p.lexer.line_number - 1}. 
                 Invalid operand: {p[2]}.
                 Must be one of (000, 400, 800).
                 '''
