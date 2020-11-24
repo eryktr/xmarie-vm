@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name='xmarievm',
-    version='1.9.3',
+    version='1.9.4',
     description='Virtual machine to run XMARIE code',
     author='eryktr',
     install_requires=[
