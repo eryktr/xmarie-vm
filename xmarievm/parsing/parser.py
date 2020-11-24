@@ -9,6 +9,10 @@ from xmarievm.parsing.lexer import tokens, lexer
 instructions = []
 
 
+class ParsingError(ValueError):
+    pass
+
+
 def _get_ast_obj(token: str) -> type:
     return getattr(ast_types, token)
 
@@ -22,7 +26,7 @@ def p_program(p):
     for ast_obj in p[1]:
         if isinstance(ast_obj, ast_types.Label):
             if ast_obj.name in labels:
-                raise NameError(f'Redefined label: {ast_obj.name}')
+                raise ParsingError(f'Redefined label: {ast_obj.name}')
             labels[ast_obj.name] = ast_obj.addr
             instructions.append(ast_obj.val)
         else:
@@ -87,9 +91,9 @@ def p_number_definition(p):
                       | DEC NUM NEWLINE
     '''
     if p[1] == 'DEC' and p[2] > MAX_DEC:
-        raise ValueError(f'Maximum integer value: {MAX_DEC} exceeded.')
+        raise ParsingError(f'Maximum integer value: {MAX_DEC} exceeded.')
     if p[1] == 'HEX' and p[2] > MAX_HEX:
-        raise ValueError(f'Maximum variable length: {MEM_BITSIZE} exceeded')
+        raise ParsingError(f'Maximum variable length: {MEM_BITSIZE} exceeded')
     p[0] = _get_ast_obj(p[1])(p[2])
 
 
@@ -149,6 +153,7 @@ _parser = yacc.yacc(write_tables=False, debug=False)
 
 def parse(code):
     lexer.lineno = 0
+    lexer.line_number = 1
     return _parser.parse(code.lstrip())
 
 # code = '''\
