@@ -130,11 +130,12 @@ class MarieVm:
         while self.running:
             self.step()
 
-    def setup_debug(self, program: Program, breakpoints: List[Breakpoint], line_array: List[int]):
+    def setup_debug(self, program: Program, breakpoints: List[Breakpoint], line_array: List[int], input_: str):
         self.pc_to_breakpoint = {
             b.current_lineno - 1: b
             for b in breakpoints
         }
+        self.input_stream = BufferedInputStream(input_)
         self.running = True
         self.is_in_debug_mode = True
         self._load_into_memory(program)
@@ -276,7 +277,7 @@ class MarieVm:
 
     def _input(self, target):
         val = self.input_stream.read()
-        self.AC = int_from_2c(int(val, 16), MEM_BITSIZE)
+        self._AC = int_from_2c(int(val, 16), MEM_BITSIZE)
 
     def _output(self, target):
         self.output_stream.write(int_in_2c_to_hex(self.AC, MEM_BITSIZE))
