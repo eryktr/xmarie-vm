@@ -123,9 +123,11 @@ class MarieVm:
     def AC(self, val):
         self._AC = int_from_2c(val, MEM_BITSIZE)
 
-    def execute(self, program: Program, line_array: List[int]) -> None:
+    def execute(self, program: Program, line_array: List[int], input_=None) -> None:
         self.line_array = line_array
         self._load_into_memory(program)
+        if input_ is not None:
+            self.input_stream = BufferedInputStream(input_)
         self.running = True
         while self.running:
             self.step()
