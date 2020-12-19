@@ -4,6 +4,7 @@ Translates the Abstract Syntax Tree into machine code
 from typing import List, Dict
 
 from xmarievm.parsing.ast_types import Instruction
+from xmarievm.parsing.parser import ParsingError
 
 
 def translate(instructions: List[Instruction], labels: Dict[str, int]) -> List[int]:
@@ -13,6 +14,6 @@ def translate(instructions: List[Instruction], labels: Dict[str, int]) -> List[i
             try:
                 i.arg = labels[i.arg]
             except KeyError:
-                raise ValueError(f'Undefined label: {i.arg}')
+                raise ParsingError(f'Undefined label: {i.arg}')
         encoded_instructions.append(i.translate())
     return encoded_instructions
