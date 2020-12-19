@@ -13,6 +13,6 @@ def translate(instructions: List[Instruction], labels: Dict[str, int]) -> List[i
             try:
                 i.arg = labels[i.arg]
             except KeyError:
-                raise SyntaxError(f'Undefined label: {i.arg}')
+                raise RuntimeError(f'Undefined label: {i.arg}')
         encoded_instructions.append(i.translate())
     return encoded_instructions
