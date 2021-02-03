@@ -35,12 +35,41 @@ Each instruction takes **20 bits** (8 for opcode, 12 for argument)
 To simplify the description of instructions, let me introduce a shorthand notation.
 Let **M(X)** denote the value stored at address *X* in memory. 
 
-#### Direct arichmetics
-- **Add X** -> AC = AC + M(x)
-- **
+#### Direct arithmetics
+- **Add X** -> AC = AC + M(X)
+- **Subt X** -> AC = AC - M(X)
+- **Incr** -> AC = AC + 1
+- **Decr** -> AC = AC - 1
+- **ShiftL X** -> AC = AC * 2^M(X)
+- **ShiftR X** -> AC = floor(AC / 2^M(X))
+- **Clear** -> AC = 0
 
+#### Indirect arithmetics
+- **AddI X** -> AC = AC + M(M(X))
+- **SubtI X** -> AC = AC - M(M(X))
 
-## Features
+#### Direct data transfer
+- **Load X** -> AC = M(X)
+- **Store X** -> M(X) := AC
+- **StoreX** -> X := AC
+- **StoreY** -> Y := AC
+
+#### Indirect data transfer
+- **LoadI X** -> AC = M(M(X))
+- **StoreI X** -> M(M(X)) := AC
+
+#### I/O
+- **Input** -> Read a number from user and store it in AC
+- **Output** -> Print the content of AC to stdout
+
+#### Control flow
+- **JnS X** -> Store current value of PC in X, then set PC to X + 1.
+- **Jump X** -> PC := X
+- **Halt** -> Stop the program
+
+#### Stack
+- **Push**
+- **Pop**
 
 ## Api
 
