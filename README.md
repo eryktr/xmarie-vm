@@ -59,8 +59,7 @@ Let **M(X)** denote the value stored at address *X* in memory.
 - **StoreI X** -> M(M(X)) := AC
 
 #### I/O
-- **Input** -> Read a number from user and store it in AC
-- **Output** -> Print the content of AC to stdout
+ - **Output** -> Print the content of AC to stdout
 
 #### Control flow
 - **JnS X** -> Store current value of PC in X, then set PC to X + 1.
@@ -72,5 +71,32 @@ Let **M(X)** denote the value stored at address *X* in memory.
 - **Pop**
 
 ## Api
+
+### MarieVm
+The main construction exported by the xmarie-vm project is the **MarieVm** class. Its constructor takes the following arguments:
+- `memory` - list of integers. The initial state of the memory
+- `input stream` - an object which implements the `read() -> str` method
+- `outpt stream` - an object which extends the OutputStream abstract base class 
+- `stack` - list of integers - the initial state of the stack - possibly an empty list. The closer an element is to the beginning of the list, the closer to the top of the stack it is.
+- `max_num_executed_instrs` - the maximum number of executed instructions, after which the currently running program will be terminated.
+
+### Breakpoints
+The module `xmarievm/breakpoints.py` provides provides breakpoint abstractions that will be used for debugging.
+The code provided by user is `minified` before being parsed - the main change is that blank lines are removed. To keep track 
+of the place in the original code certain breakpoint refers to, each breakpoint needs to consist of these three things: 
+1. current line
+2. original line
+3. instruction
+
+The **current line** is the line number in the minified code and **original line** is the line number certain instruction 
+was on in the original code (the one provided by user to be executed)
+
+The list of breakpoints can be conveniently generated using the `parse_breakpoints` function from this module. It takes in two arguments
+1. breakpoints - list of integers corresponding to line numbers of instructions that are marked with breakpoints. For example, if you want to put a breakpoint in the second and fifth line in the code provided as argument, you want to pass in the list `[2, 5]`.
+2. code - the code to be executed, represented as string.
+
+The function will return a list of `Breakpoint` objects.
+
+
 
 ## Installation
