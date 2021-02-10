@@ -70,6 +70,26 @@ Let **M(X)** denote the value stored at address *X* in memory.
 - **Push**
 - **Pop**
 
+## Sample Code
+The below code sample reads an integer N from the user and outputs the sum from 1 to N.
+```
+    Store N
+    Loop, Load SUM
+    Add N
+    Store SUM
+    Load N
+    Decr
+    Store N
+    Skipcond 400
+    Jump Loop
+    Load SUM
+    Output
+    Halt
+
+    N, DEC 0
+    SUM, DEC 0
+```
+
 ## Api
 
 ### MarieVm
@@ -114,4 +134,4 @@ pip install -e .
 pip install -e "[.dev]"
 ```
 
-   
+`xmarie-vm` is also available as a package, but it's not currently available on PyPi.
