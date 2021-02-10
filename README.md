@@ -135,3 +135,17 @@ pip install -e "[.dev]"
 ```
 
 `xmarie-vm` is also available as a package, but it's not currently available on PyPi.
+
+## Testing
+There are two levels of testing - Unit Tests and System Tests.
+
+### Unit Tests
+To run unit tests, simply call
+```
+pytest
+```
+
+In the project's root directory.
+
+### System Tests
+The automated testing system is implemented in the [xmarie-ts](https://github.com/eryktr/xmarie-ts) repository.
