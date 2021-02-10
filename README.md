@@ -97,6 +97,9 @@ The list of breakpoints can be conveniently generated using the `parse_breakpoin
 
 The function will return a list of `Breakpoint` objects.
 
+### Snapshots
+The module `xmarievm/runtime/snapshot_maker.py` provides the implementation of the `Snapshot` object. That is a data transfer object representing the state of the VM at a given point in time. The fields it has correspond to the fields in the VM. The object can therefore easily be converted to formats like JSON.
 
+The `make_snapshot` function is a utility for quick snapshot generation. Its only argument is the `vm` instance whose snapshot will be taken.
 
 ## Installation
