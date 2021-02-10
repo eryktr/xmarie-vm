@@ -103,3 +103,15 @@ The module `xmarievm/runtime/snapshot_maker.py` provides the implementation of t
 The `make_snapshot` function is a utility for quick snapshot generation. Its only argument is the `vm` instance whose snapshot will be taken.
 
 ## Installation
+1. Clone the repository
+2. cd into the main directory (the one containing the setup.py file)
+3. Run
+```
+pip install -e .
+```
+4. If you want to also install development dependencies, instead run
+```
+pip install -e "[.dev]"
+```
+
+   
